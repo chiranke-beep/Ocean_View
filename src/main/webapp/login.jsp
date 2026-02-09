@@ -179,7 +179,7 @@
             }
         %>
 
-        <form method="post" action="login" onsubmit="return validateForm();">
+        <form method="post" action="<%= request.getContextPath() %>/login" onsubmit="return validateForm();">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input 
