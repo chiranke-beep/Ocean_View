@@ -47,17 +47,42 @@ public class LoginServlet extends HttpServlet {
                 ps.execute();
             }
 
-            // Create room table
-            String createRoom = "CREATE TABLE IF NOT EXISTS room (" +
-                    "room_id INT PRIMARY KEY AUTO_INCREMENT, " +
-                    "room_number VARCHAR(10) UNIQUE NOT NULL, " +
-                    "room_type VARCHAR(50) NOT NULL, " +
-                    "price_per_night DECIMAL(10, 2) NOT NULL, " +
-                    "capacity INT, " +
-                    "status VARCHAR(20) DEFAULT 'Available', " +
-                    "created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+            // Drop tables in correct order (bill depends on reservation)
+            try (PreparedStatement ps = conn.prepareStatement("DROP TABLE IF EXISTS bill")) {
+                ps.execute();
+            }
+            try (PreparedStatement ps = conn.prepareStatement("DROP TABLE IF EXISTS reservation")) {
+                ps.execute();
+            }
+            try (PreparedStatement ps = conn.prepareStatement("DROP TABLE IF EXISTS guest")) {
+                ps.execute();
+            }
+
+            // Create guest table
+            String createGuest = "CREATE TABLE IF NOT EXISTS guest (" +
+                    "guest_id INT PRIMARY KEY AUTO_INCREMENT, " +
+                    "name VARCHAR(100) NOT NULL, " +
+                    "address VARCHAR(255) NOT NULL, " +
+                    "contact_number VARCHAR(20) NOT NULL, " +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                     ") ENGINE=InnoDB";
-            try (PreparedStatement ps = conn.prepareStatement(createRoom)) {
+            try (PreparedStatement ps = conn.prepareStatement(createGuest)) {
+                ps.execute();
+            }
+
+            // Create reservation table
+            String createReservation = "CREATE TABLE IF NOT EXISTS reservation (" +
+                    "reservation_id INT PRIMARY KEY AUTO_INCREMENT, " +
+                    "reservation_number VARCHAR(20) UNIQUE NOT NULL, " +
+                    "guest_id INT NOT NULL, " +
+                    "room_type VARCHAR(50) NOT NULL, " +
+                    "check_in_date DATE NOT NULL, " +
+                    "check_out_date DATE NOT NULL, " +
+                    "status VARCHAR(50) DEFAULT 'Confirmed', " +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY (guest_id) REFERENCES guest(guest_id) ON DELETE CASCADE" +
+                    ") ENGINE=InnoDB";
+            try (PreparedStatement ps = conn.prepareStatement(createReservation)) {
                 ps.execute();
             }
 
@@ -162,7 +187,13 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = req.getSession(true);
                 session.setAttribute("username", username);
                 session.setAttribute("role", role);
-                resp.sendRedirect(req.getContextPath() + "/admin-dashboard");
+                
+                // Redirect based on role
+                if ("Staff".equalsIgnoreCase(role)) {
+                    resp.sendRedirect(req.getContextPath() + "/staff-dashboard");
+                } else {
+                    resp.sendRedirect(req.getContextPath() + "/admin-dashboard");
+                }
             } else {
                 req.setAttribute("error", "Invalid credentials.");
                 req.getRequestDispatcher("/login.jsp").forward(req, resp);
