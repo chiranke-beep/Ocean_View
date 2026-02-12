@@ -1,6 +1,7 @@
 package com.example.ocean_view_resort.service;
 
 import com.example.ocean_view_resort.model.Room;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -13,6 +14,7 @@ public interface RoomService {
     Room getRoomByNumber(String roomNumber);
     List<Room> getAllRooms();
     List<Room> getAvailableRooms();
+    List<Room> getAvailableRoomsByType(String roomType, LocalDate checkInDate, LocalDate checkOutDate);
     boolean addRoom(String roomNumber, String roomType, double pricePerNight, int capacity);
     boolean updateRoom(int roomId, String roomNumber, String roomType, double pricePerNight, int capacity, String status);
     boolean deleteRoom(int roomId);

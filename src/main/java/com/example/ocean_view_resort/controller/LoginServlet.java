@@ -47,18 +47,7 @@ public class LoginServlet extends HttpServlet {
                 ps.execute();
             }
 
-            // Drop tables in correct order (bill depends on reservation)
-            try (PreparedStatement ps = conn.prepareStatement("DROP TABLE IF EXISTS bill")) {
-                ps.execute();
-            }
-            try (PreparedStatement ps = conn.prepareStatement("DROP TABLE IF EXISTS reservation")) {
-                ps.execute();
-            }
-            try (PreparedStatement ps = conn.prepareStatement("DROP TABLE IF EXISTS guest")) {
-                ps.execute();
-            }
-
-            // Create guest table
+            // Create guest table (if not exists - preserves data on restart)
             String createGuest = "CREATE TABLE IF NOT EXISTS guest (" +
                     "guest_id INT PRIMARY KEY AUTO_INCREMENT, " +
                     "name VARCHAR(100) NOT NULL, " +
@@ -70,20 +59,33 @@ public class LoginServlet extends HttpServlet {
                 ps.execute();
             }
 
-            // Create reservation table
+            // Create reservation table (if not exists - preserves data on restart)
             String createReservation = "CREATE TABLE IF NOT EXISTS reservation (" +
                     "reservation_id INT PRIMARY KEY AUTO_INCREMENT, " +
                     "reservation_number VARCHAR(20) UNIQUE NOT NULL, " +
                     "guest_id INT NOT NULL, " +
+                    "room_id INT, " +
                     "room_type VARCHAR(50) NOT NULL, " +
                     "check_in_date DATE NOT NULL, " +
                     "check_out_date DATE NOT NULL, " +
                     "status VARCHAR(50) DEFAULT 'Confirmed', " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                    "FOREIGN KEY (guest_id) REFERENCES guest(guest_id) ON DELETE CASCADE" +
+                    "FOREIGN KEY (guest_id) REFERENCES guest(guest_id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (room_id) REFERENCES room(room_id) ON DELETE SET NULL" +
                     ") ENGINE=InnoDB";
             try (PreparedStatement ps = conn.prepareStatement(createReservation)) {
                 ps.execute();
+            }
+
+            // Add room_id column to existing reservation table if it doesn't exist
+            try {
+                String alterReservation = "ALTER TABLE reservation ADD COLUMN room_id INT, " +
+                        "ADD FOREIGN KEY (room_id) REFERENCES room(room_id) ON DELETE SET NULL";
+                try (PreparedStatement ps = conn.prepareStatement(alterReservation)) {
+                    ps.execute();
+                }
+            } catch (Exception e) {
+                // Column already exists or other error - ignore
             }
 
             // Insert default admin if not exists
@@ -96,25 +98,6 @@ public class LoginServlet extends HttpServlet {
                         try (PreparedStatement ips = conn.prepareStatement(insertAdmin)) {
                             ips.setString(1, "admin");
                             ips.setString(2, PasswordUtil.hash("chiran123"));
-                            ips.executeUpdate();
-                        }
-                    }
-                }
-            }
-
-            // Insert default staff if not exists
-            String checkStaff = "SELECT COUNT(*) FROM staff WHERE username = ?";
-            try (PreparedStatement ps = conn.prepareStatement(checkStaff)) {
-                ps.setString(1, "staff1");
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next() && rs.getInt(1) == 0) {
-                        String insertStaff = "INSERT INTO staff (name, username, password, contact_number, role) VALUES (?, ?, ?, ?, ?)";
-                        try (PreparedStatement ips = conn.prepareStatement(insertStaff)) {
-                            ips.setString(1, "John Doe");
-                            ips.setString(2, "staff1");
-                            ips.setString(3, PasswordUtil.hash("staff123"));
-                            ips.setString(4, "+1234567890");
-                            ips.setString(5, "Receptionist");
                             ips.executeUpdate();
                         }
                     }
