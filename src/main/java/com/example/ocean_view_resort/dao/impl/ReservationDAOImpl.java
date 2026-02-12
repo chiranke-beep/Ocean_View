@@ -64,16 +64,17 @@ public class ReservationDAOImpl implements ReservationDAO {
 
     @Override
     public void addReservation(Reservation reservation) throws SQLException {
-        String sql = "INSERT INTO reservation (reservation_number, guest_id, room_type, check_in_date, check_out_date, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservation (reservation_number, guest_id, room_id, room_type, check_in_date, check_out_date, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = DatabaseConnection.getInstance().getConnection();
         try (PreparedStatement stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, reservation.getReservationNumber());
             stmt.setInt(2, reservation.getGuestId());
-            stmt.setString(3, reservation.getRoomType());
-            stmt.setDate(4, Date.valueOf(reservation.getCheckInDate()));
-            stmt.setDate(5, Date.valueOf(reservation.getCheckOutDate()));
-            stmt.setString(6, "Confirmed");
-            stmt.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(3, reservation.getRoomId());
+            stmt.setString(4, reservation.getRoomType());
+            stmt.setDate(5, Date.valueOf(reservation.getCheckInDate()));
+            stmt.setDate(6, Date.valueOf(reservation.getCheckOutDate()));
+            stmt.setString(7, "Confirmed");
+            stmt.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
             int result = stmt.executeUpdate();
             System.out.println("Reservation insert result: " + result);
             
@@ -94,15 +95,16 @@ public class ReservationDAOImpl implements ReservationDAO {
 
     @Override
     public void updateReservation(Reservation reservation) {
-        String sql = "UPDATE reservation SET guest_id = ?, room_type = ?, check_in_date = ?, check_out_date = ?, status = ? WHERE reservation_id = ?";
+        String sql = "UPDATE reservation SET guest_id = ?, room_id = ?, room_type = ?, check_in_date = ?, check_out_date = ?, status = ? WHERE reservation_id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, reservation.getGuestId());
-            stmt.setString(2, reservation.getRoomType());
-            stmt.setDate(3, Date.valueOf(reservation.getCheckInDate()));
-            stmt.setDate(4, Date.valueOf(reservation.getCheckOutDate()));
-            stmt.setString(5, reservation.getStatus());
-            stmt.setInt(6, reservation.getReservationId());
+            stmt.setInt(2, reservation.getRoomId());
+            stmt.setString(3, reservation.getRoomType());
+            stmt.setDate(4, Date.valueOf(reservation.getCheckInDate()));
+            stmt.setDate(5, Date.valueOf(reservation.getCheckOutDate()));
+            stmt.setString(6, reservation.getStatus());
+            stmt.setInt(7, reservation.getReservationId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -142,15 +144,17 @@ public class ReservationDAOImpl implements ReservationDAO {
     }
 
     private Reservation mapResultSetToReservation(ResultSet rs) throws SQLException {
-        return new Reservation(
+        Reservation reservation = new Reservation(
                 rs.getInt("reservation_id"),
                 rs.getString("reservation_number"),
                 rs.getInt("guest_id"),
+                rs.getInt("room_id"),
                 rs.getString("room_type"),
                 rs.getDate("check_in_date").toLocalDate(),
                 rs.getDate("check_out_date").toLocalDate(),
                 rs.getString("status"),
                 rs.getTimestamp("created_at").toLocalDateTime()
         );
+        return reservation;
     }
 }

@@ -351,15 +351,22 @@
                     </div>
                     <div class="form-group">
                         <label>Room Type</label>
-                        <input type="text" name="roomType" placeholder="Deluxe" required>
+                        <select name="roomType" required>
+                            <option value="">-- Select Room Type --</option>
+                            <option value="Single">Single</option>
+                            <option value="Double">Double</option>
+                            <option value="Deluxe">Deluxe</option>
+                            <option value="Suite">Suite</option>
+                            <option value="Presidential">Presidential</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Price Per Night ($)</label>
-                        <input type="number" name="pricePerNight" placeholder="150" step="0.01" required>
+                        <input type="number" name="pricePerNight" placeholder="150" step="0.01" min="0.01" required>
                     </div>
                     <div class="form-group">
                         <label>Capacity (Guests)</label>
-                        <input type="number" name="capacity" placeholder="2" required>
+                        <input type="number" name="capacity" placeholder="2" min="1" required>
                     </div>
                 </div>
                 <button class="btn" type="submit">Add Room</button>
