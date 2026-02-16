@@ -5,7 +5,6 @@ import com.example.ocean_view_resort.model.Reservation;
 import com.example.ocean_view_resort.utils.DatabaseConnection;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

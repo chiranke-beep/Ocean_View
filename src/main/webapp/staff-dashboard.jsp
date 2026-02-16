@@ -555,7 +555,7 @@
                         </div>
                     </div>
 
-                    <div id="priceDisplay" style="background: #f5ede0; padding: 15px 20px; border-radius: 6px; margin: 15px 0; font-size: 16px; font-weight: 600; color: #c49055; width: 100%; text-align: left; border-left: 4px solid #d4a574; display: none;"></div>
+                    <div id="priceDisplay" style="background: #f5ede0; padding: 15px 20px; border-radius: 6px; margin: 15px 0; font-size: 16px; font-weight: 600; color: #c49055; width: 100%; text-align: left; border-left: 4px solid #d4a574; display: none;"><!-- Price will be shown here in LKR --></div>
 
                     <div class="form-group">
                         <label for="checkInDate">Check-In Date *</label>
@@ -631,6 +631,7 @@
 
         <!-- Tab 4: Help & Instructions -->
         <div id="help-tab" class="tab-content">
+<<<<<<< HEAD
             <h2 style="color: #333; margin-bottom: 20px;">Help & Instructions</h2>
             <div style="background: #f5ede0; padding: 20px; border-radius: 10px; line-height: 1.8;">
                 
@@ -696,6 +697,122 @@
                     <strong style="color: #856404;">💡 Tip:</strong> Always verify guest information and reservation details before confirming. Double-check dates to avoid overbooking.
                 </div>
             </div>
+=======
+            <h2 style="color: #333; margin-bottom: 10px;">📖 Help & Instructions</h2>
+            <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Welcome! This guide will help you efficiently manage guest reservations and navigate the Ocean View Resort staff dashboard.</p>
+
+            <!-- Managing Guests Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
+                <h3 style="color: #c49055; margin-bottom: 15px;">1️⃣ Managing Guests</h3>
+                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">Before creating reservations, you must add guests to the system:</p>
+                <ul style="color: #333; margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Click "Manage Guests" tab</strong> to access the guest management section</li>
+                    <li><strong>Guest Name:</strong> Enter the full name (minimum 3 characters)</li>
+                    <li><strong>Contact Number:</strong> Phone number for communication with the guest</li>
+                    <li><strong>Address:</strong> Complete residential address (minimum 5 characters)</li>
+                    <li><strong>Click "✓ Add Guest"</strong> to save the new guest</li>
+                    <li><strong>Delete Guest:</strong> Use the Delete button to remove a guest (only if no active reservations)</li>
+                </ul>
+            </div>
+
+            <!-- Making Reservations Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
+                <h3 style="color: #c49055; margin-bottom: 15px;">2️⃣ Making Reservations</h3>
+                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">Step-by-step guide to creating a new reservation:</p>
+                <ol style="color: #333; margin-left: 20px; line-height: 1.9;">
+                    <li><strong>Go to "Manage Reservations" tab</strong></li>
+                    <li><strong>Select Guest:</strong> Choose from the dropdown list. Add guests first if the list is empty</li>
+                    <li><strong>Choose Room Type:</strong> Select from Single, Double, Deluxe, Suite, or Presidential</li>
+                    <li><strong>Select Check-In Date:</strong> Must be today or a future date (past dates not allowed)</li>
+                    <li><strong>Select Check-Out Date:</strong> Must be after check-in date (minimum 1 night stay)</li>
+                    <li><strong>Pick a Room:</strong> The system shows available rooms based on your selections. Price per night is displayed</li>
+                    <li><strong>Click "✓ Add Reservation"</strong> to confirm and create the reservation</li>
+                </ol>
+                <p style="color: #c49055; margin-top: 15px; font-size: 13px;"><strong>💡 Tip:</strong> The room list automatically updates when you change dates or room type, showing only available rooms for your chosen period.</p>
+            </div>
+
+            <!-- Viewing Reservations Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
+                <h3 style="color: #c49055; margin-bottom: 15px;">3️⃣ Viewing & Managing Reservations</h3>
+                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">The "View All Reservations" tab shows all bookings:</p>
+                <ul style="color: #333; margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Reservation Number:</strong> Unique identifier for each booking (format: RES-XXXX)</li>
+                    <li><strong>Guest Details:</strong> Name and contact number from the guest table</li>
+                    <li><strong>Room Information:</strong> Room type and check-in/check-out dates</li>
+                    <li><strong>Status:</strong> Current booking status (Active, Completed, Cancelled)</li>
+                    <li><strong>📥 Bill:</strong> Click to download PDF bill with pricing breakdown and guest details</li>
+                    <li><strong>✏️ Edit:</strong> Modify room, dates, or other details (opens modal window)</li>
+                    <li><strong>Delete:</strong> Cancel the reservation completely</li>
+                </ul>
+            </div>
+
+            <!-- Important Notes Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
+                <h3 style="color: #c49055; margin-bottom: 15px;">4️⃣ Important Notes & Rules</h3>
+                <ul style="color: #333; margin-left: 20px; line-height: 1.9;">
+                    <li><strong>Room Availability:</strong> Once a room is booked for dates, it won't appear in the available list for overlapping dates</li>
+                    <li><strong>Minimum Stay:</strong> Reservations must be for at least 1 night; check-out must be after check-in</li>
+                    <li><strong>Currency:</strong> All prices are displayed in LKR (Sri Lankan Rupee)</li>
+                    <li><strong>Reservation Number:</strong> Unique for each booking; provide to guests for reference</li>
+                    <li><strong>Room Status:</strong> Updated automatically based on reservation dates (Available, Booked, Maintenance)</li>
+                    <li><strong>Guest Information:</strong> Always verify guest contact details before confirming reservations</li>
+                    <li><strong>Date Changes:</strong> When editing dates, ensure new dates don't conflict with other bookings</li>
+                </ul>
+            </div>
+
+            <!-- Bill Generation Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
+                <h3 style="color: #c49055; margin-bottom: 15px;">5️⃣ Bill Generation</h3>
+                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">Generate and download guest bills:</p>
+                <ul style="color: #333; margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Click "📥 Bill" button</strong> in the actions column of any reservation</li>
+                    <li><strong>PDF Download:</strong> A formatted bill is automatically downloaded to your computer</li>
+                    <li><strong>Bill Contents:</strong> Guest info, room details, check-in/check-out dates, total nights, daily rate, and total charge</li>
+                    <li><strong>Calculation:</strong> Total = Price per Night × Number of Nights</li>
+                    <li><strong>Sharing:</strong> Print or email the bill to guests for reference and payment</li>
+                </ul>
+            </div>
+
+            <!-- Troubleshooting Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
+                <h3 style="color: #c49055; margin-bottom: 15px;">❌ Troubleshooting Common Issues</h3>
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #333;">Problem: "No rooms available" message</strong>
+                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Try selecting different check-in/check-out dates<br/>✓ Check if all rooms of that type are already booked for those dates<br/>✓ Try a different room type</p>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #333;">Problem: "Guest not found" in dropdown</strong>
+                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Add the guest first in the "Manage Guests" tab<br/>✓ Ensure the guest name is spelled correctly</p>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #333;">Problem: Can't select dates in the past</strong>
+                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Check-in date must be today or later (system blocks past dates)<br/>✓ Check-out date must be after check-in date</p>
+                </div>
+                <div>
+                    <strong style="color: #333;">Problem: Edit modal won't open</strong>
+                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Ensure JavaScript is enabled in your browser<br/>✓ Try refreshing the page<br/>✓ Check browser console (F12) for errors</p>
+                </div>
+            </div>
+
+            <!-- Helpful Tips Section -->
+            <div style="padding: 20px; background: #e8dcc8; border-left: 4px solid #c49055; border-radius: 5px; margin-bottom: 20px;">
+                <h3 style="color: #c49055; margin-bottom: 12px;">💡 Best Practices & Helpful Tips</h3>
+                <ul style="color: #333; margin-left: 20px; line-height: 1.9;">
+                    <li><strong>Always verify guest information</strong> – Double-check spelling and contact numbers before confirmation</li>
+                    <li><strong>Confirm dates with guests</strong> – Even small date mistakes can cause booking conflicts</li>
+                    <li><strong>Note the Reservation Number</strong> – Give it to guests so they can reference their booking</li>
+                    <li><strong>Keep guest records updated</strong> – Update address or contact info if guest provides new details</li>
+                    <li><strong>Check room status regularly</strong> – Be aware of maintenance windows before confirming rooms</li>
+                    <li><strong>Use Edit wisely</strong> – Re-verify availability before changing reservation dates</li>
+                    <li><strong>Download bills promptly</strong> – Generate and send bills to guests after confirmation</li>
+                </ul>
+            </div>
+
+            <!-- Contact Help Section -->
+            <div style="padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724;">
+                <strong>Need more help?</strong> Contact the management team or refer to the hotel operations manual for detailed policies.
+            </div>
+>>>>>>> HelpSectionFeature
         </div>
     </div>
 </div>
@@ -759,7 +876,7 @@
         availableRooms.forEach(room => {
             const option = document.createElement('option');
             option.value = room.roomId;
-            option.textContent = 'Room ' + room.roomNumber + ' - $' + room.pricePerNight + '/night (' + room.status + ')';
+            option.textContent = 'Room ' + room.roomNumber + ' - LKR ' + room.pricePerNight + '/night (' + room.status + ')';
             option.setAttribute('data-price', room.pricePerNight);
             if (room.roomId == selectedRoomId) {
                 option.selected = true;
@@ -772,7 +889,7 @@
             const selectedRoom = availableRooms.find(room => room.roomId == selectedRoomId);
             if (selectedRoom) {
                 if (priceDisplay) {
-                    priceDisplay.innerHTML = '💰 Price: $' + selectedRoom.pricePerNight + '/night';
+                    priceDisplay.innerHTML = '💰 Price: LKR ' + selectedRoom.pricePerNight + '/night';
                     priceDisplay.style.display = 'block';
                 }
             }
@@ -790,7 +907,7 @@
             console.log('Selected option:', selectedOption.textContent);
             console.log('Price attribute:', price);
             if (priceDisplay && price) {
-                const priceHTML = '💰 Price: $' + price + '/night';
+                const priceHTML = '💰 Price: LKR ' + price + '/night';
                 console.log('Setting price HTML to:', priceHTML);
                 priceDisplay.innerHTML = priceHTML;
                 priceDisplay.style.display = 'block';
@@ -920,7 +1037,7 @@
         availableRooms.forEach(room => {
             const option = document.createElement('option');
             option.value = room.roomId;
-            option.textContent = 'Room ' + room.roomNumber + ' - $' + room.pricePerNight + '/night (' + room.status + ')';
+            option.textContent = 'Room ' + room.roomNumber + ' - LKR ' + room.pricePerNight + '/night (' + room.status + ')';
             option.setAttribute('data-price', room.pricePerNight);
             roomIdSelect.appendChild(option);
         });
@@ -946,7 +1063,7 @@
 
         if (nights > 0 && pricePerNight) {
             const totalPrice = (nights * parseFloat(pricePerNight)).toFixed(2);
-            priceDisplay.innerHTML = '💰 Price: $' + pricePerNight + '/night × ' + nights + ' nights = <strong>$' + totalPrice + '</strong>';
+            priceDisplay.innerHTML = '💰 Price: LKR ' + pricePerNight + '/night × ' + nights + ' nights = <strong>LKR ' + totalPrice + '</strong>';
             priceDisplay.style.display = 'block';
         } else {
             priceDisplay.innerHTML = '';
@@ -1019,7 +1136,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="editRoomId">Room:</label>
+                        <label for="editRoomId">Room (LKR):</label>
                         <select id="editRoomId" name="roomId" required>
                             <option value="">-- Select a Room --</option>
                         </select>
