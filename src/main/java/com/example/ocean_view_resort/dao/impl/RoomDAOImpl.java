@@ -132,6 +132,23 @@ public class RoomDAOImpl implements RoomDAO {
         return false;
     }
 
+    @Override
+    public java.math.BigDecimal getPriceByRoomType(String roomType) {
+        String sql = "SELECT price_per_night FROM room WHERE room_type = ? LIMIT 1";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, roomType);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return java.math.BigDecimal.valueOf(rs.getDouble("price_per_night"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return java.math.BigDecimal.ZERO;
+    }
+
     private Room mapResultSetToRoom(ResultSet rs) throws SQLException {
         return new Room(
                 rs.getInt("room_id"),

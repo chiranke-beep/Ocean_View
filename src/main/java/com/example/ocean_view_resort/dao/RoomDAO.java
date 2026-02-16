@@ -11,4 +11,5 @@ public interface RoomDAO {
     boolean addRoom(Room room);
     boolean updateRoom(Room room);
     boolean deleteRoom(int roomId);
+    java.math.BigDecimal getPriceByRoomType(String roomType);
 }
