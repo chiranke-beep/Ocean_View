@@ -3,6 +3,7 @@ package com.example.ocean_view_resort.dao.impl;
 import com.example.ocean_view_resort.dao.RoomDAO;
 import com.example.ocean_view_resort.model.Room;
 import com.example.ocean_view_resort.utils.DatabaseConnection;
+import com.example.ocean_view_resort.utils.DatabaseResetUtil;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -127,6 +128,9 @@ public class RoomDAOImpl implements RoomDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, roomId);
             int result = ps.executeUpdate();
+            if (result > 0) {
+                DatabaseResetUtil.resetAutoIncrementIfEmpty("room");
+            }
             return result > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -180,6 +184,46 @@ public class RoomDAOImpl implements RoomDAO {
             ps.setDate(5, java.sql.Date.valueOf(checkInDate));
             ps.setDate(6, java.sql.Date.valueOf(checkInDate));
             ps.setDate(7, java.sql.Date.valueOf(checkOutDate));
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    availableRooms.add(mapResultSetToRoom(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return availableRooms;
+    }
+
+    public List<Room> getAvailableRoomsByTypeExcluding(String roomType, LocalDate checkInDate, LocalDate checkOutDate, int excludeReservationId) {
+        List<Room> availableRooms = new ArrayList<>();
+        
+        String sql = "SELECT DISTINCT r.* FROM room r " +
+                "WHERE r.room_type = ? " +
+                "AND r.room_id NOT IN (" +
+                "  SELECT DISTINCT res.room_id FROM reservation res " +
+                "  WHERE res.room_id IS NOT NULL " +
+                "  AND res.status != 'Cancelled' " +
+                "  AND res.reservation_id != ? " +
+                "  AND (" +
+                "    (res.check_in_date < ? AND res.check_out_date > ?) " +
+                "    OR (res.check_in_date >= ? AND res.check_in_date < ?) " +
+                "    OR (res.check_out_date > ? AND res.check_out_date <= ?)" +
+                "  )" +
+                ")";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, roomType);
+            ps.setInt(2, excludeReservationId);
+            ps.setDate(3, java.sql.Date.valueOf(checkOutDate));
+            ps.setDate(4, java.sql.Date.valueOf(checkInDate));
+            ps.setDate(5, java.sql.Date.valueOf(checkOutDate));
+            ps.setDate(6, java.sql.Date.valueOf(checkInDate));
+            ps.setDate(7, java.sql.Date.valueOf(checkInDate));
+            ps.setDate(8, java.sql.Date.valueOf(checkOutDate));
             
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

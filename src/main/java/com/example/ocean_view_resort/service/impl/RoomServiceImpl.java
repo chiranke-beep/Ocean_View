@@ -49,6 +49,19 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public List<Room> getAvailableRoomsByTypeExcluding(String roomType, LocalDate checkInDate, LocalDate checkOutDate, int excludeReservationId) {
+        if (roomType == null || roomType.isEmpty() || checkInDate == null || checkOutDate == null) {
+            return java.util.Collections.emptyList();
+        }
+        
+        if (checkInDate.isAfter(checkOutDate) || checkInDate.isEqual(checkOutDate)) {
+            return java.util.Collections.emptyList();
+        }
+        
+        return roomDAO.getAvailableRoomsByTypeExcluding(roomType, checkInDate, checkOutDate, excludeReservationId);
+    }
+
+    @Override
     public BigDecimal getPriceByRoomType(String roomType) {
         if (roomType == null || roomType.isEmpty()) {
             return BigDecimal.ZERO;

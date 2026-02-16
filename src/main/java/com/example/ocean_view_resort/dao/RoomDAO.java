@@ -11,6 +11,7 @@ public interface RoomDAO {
     List<Room> getAllRooms();
     List<Room> getRoomsByStatus(String status);
     List<Room> getAvailableRoomsByType(String roomType, LocalDate checkInDate, LocalDate checkOutDate);
+    List<Room> getAvailableRoomsByTypeExcluding(String roomType, LocalDate checkInDate, LocalDate checkOutDate, int excludeReservationId);
     BigDecimal getPriceByRoomType(String roomType); // Get first room price for a room type (fallback for bill generation)
     boolean addRoom(Room room);
     boolean updateRoom(Room room);

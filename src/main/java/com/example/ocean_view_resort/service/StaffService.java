@@ -14,5 +14,6 @@ public interface StaffService {
     List<Staff> getAllStaff();
     boolean addStaff(String name, String username, String password, String contactNumber, String role);
     boolean updateStaff(int staffId, String name, String password, String contactNumber, String role);
+    boolean editStaff(int staffId, String name, String contactNumber, String role);
     boolean deleteStaff(int staffId);
 }

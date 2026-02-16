@@ -217,6 +217,126 @@
             padding: 8px 12px;
             font-size: 12px;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5ddd0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: #2c2c2c;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #8b8b8b;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #d4a574;
+        }
+
+        .modal-body {
+            margin: 20px 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #e5ddd0;
+        }
+
+        .cancel-btn {
+            padding: 10px 20px;
+            background: #e5ddd0;
+            color: #2c2c2c;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background: #d9cfc0;
+        }
+
+        .submit-btn {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #d4a574 0%, #c49055 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 165, 116, 0.3);
+        }
+
+        .edit-btn {
+            padding: 8px 12px;
+            background: #d4a574;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .edit-btn:hover {
+            background: #c49055;
+        }
     </style>
 </head>
 <body>
@@ -274,15 +394,15 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" name="name" placeholder="John Doe" required>
+                        <input type="text" name="name" placeholder="Enter full name" required minlength="3" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" name="username" placeholder="john_doe" required>
+                        <input type="text" name="username" placeholder="Enter username" required minlength="4" maxlength="50">
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" name="password" placeholder="Enter password" required>
+                        <input type="password" name="password" placeholder="Enter password" required minlength="6" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label>Contact Number</label>
@@ -321,6 +441,7 @@
                                 <td><%= staff.getRole() %></td>
                                 <td>
                                     <div class="action-btns">
+                                        <button type="button" class="edit-btn" onclick="openEditStaffModal(<%= staff.getStaffId() %>, '<%= staff.getName() %>', '<%= staff.getUsername() %>', '<%= staff.getContactNumber() %>')" title="Edit Staff">✏️ Edit</button>
                                         <form method="post" action="<%= request.getContextPath() %>/admin-dashboard" style="display:inline;">
                                             <input type="hidden" name="action" value="delete-staff">
                                             <input type="hidden" name="staffId" value="<%= staff.getStaffId() %>">
@@ -361,7 +482,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Price Per Night ($)</label>
+                        <label>Price Per Night (LKR)</label>
                         <input type="number" name="pricePerNight" placeholder="150" step="0.01" min="0.01" required>
                     </div>
                     <div class="form-group">
@@ -397,7 +518,7 @@
                                 <td><%= room.getRoomId() %></td>
                                 <td><%= room.getRoomNumber() %></td>
                                 <td><%= room.getRoomType() %></td>
-                                <td>$<%= room.getPricePerNight() %></td>
+                                <td>LKR <%= room.getPricePerNight() %></td>
                                 <td><%= room.getCapacity() %></td>
                                 <td><span style="background: #e8f5e9; padding: 4px 8px; border-radius: 4px; font-size: 12px;"><%= room.getStatus() %></span></td>
                                 <td>
@@ -440,6 +561,66 @@
         // Add active to clicked button
         event.target.classList.add('active');
     }
+
+    // Edit Staff Modal Functions
+    function openEditStaffModal(staffId, name, username, contactNumber) {
+        const modal = document.getElementById('editStaffModal');
+        document.getElementById('editStaffIdField').value = staffId;
+        document.getElementById('editStaffNameField').value = name;
+        document.getElementById('editStaffUsernameField').value = username;
+        document.getElementById('editStaffContactField').value = contactNumber;
+        modal.style.display = 'block';
+    }
+
+    function closeEditStaffModal() {
+        const modal = document.getElementById('editStaffModal');
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('editStaffModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
 </script>
+
+<!-- Edit Staff Modal -->
+<div id="editStaffModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Staff</h2>
+            <button class="modal-close" onclick="closeEditStaffModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="<%= request.getContextPath() %>/admin-dashboard" id="editStaffForm">
+                <input type="hidden" name="action" value="edit-staff">
+                <input type="hidden" id="editStaffIdField" name="staffId">
+                <input type="hidden" name="role" value="Staff">
+
+                <div class="form-group">
+                    <label for="editStaffNameField">Full Name:</label>
+                    <input type="text" id="editStaffNameField" name="name" required minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label for="editStaffUsernameField">Username:</label>
+                    <input type="text" id="editStaffUsernameField" name="username" required minlength="4" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="editStaffContactField">Contact Number:</label>
+                    <input type="tel" id="editStaffContactField" name="contactNumber">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="cancel-btn" onclick="closeEditStaffModal()">Cancel</button>
+            <button type="submit" form="editStaffForm" class="submit-btn">Save Changes</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

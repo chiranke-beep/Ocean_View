@@ -16,6 +16,7 @@ public interface RoomService {
     List<Room> getAllRooms();
     List<Room> getAvailableRooms();
     List<Room> getAvailableRoomsByType(String roomType, LocalDate checkInDate, LocalDate checkOutDate);
+    List<Room> getAvailableRoomsByTypeExcluding(String roomType, LocalDate checkInDate, LocalDate checkOutDate, int excludeReservationId);
     BigDecimal getPriceByRoomType(String roomType); // Get first room price for a room type
     boolean addRoom(String roomNumber, String roomType, double pricePerNight, int capacity);
     boolean updateRoom(int roomId, String roomNumber, String roomType, double pricePerNight, int capacity, String status);

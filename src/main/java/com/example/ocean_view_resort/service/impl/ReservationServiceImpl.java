@@ -111,6 +111,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public List<Reservation> getReservationsByGuestId(int guestId) {
+        return reservationDAO.getReservationsByGuestId(guestId);
+    }
+
+    @Override
     public void deleteReservation(int reservationId) {
         // Get reservation before deleting to get room_id
         Reservation reservation = reservationDAO.getReservationById(reservationId);

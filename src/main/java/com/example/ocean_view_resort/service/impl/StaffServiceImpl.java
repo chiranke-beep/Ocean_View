@@ -84,6 +84,25 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
+    public boolean editStaff(int staffId, String name, String contactNumber, String role) {
+        if (name == null || name.isEmpty() || role == null || role.isEmpty()) {
+            return false;
+        }
+        
+        Staff staff = staffDAO.getStaffById(staffId);
+        if (staff == null) {
+            return false;
+        }
+        
+        staff.setName(name);
+        staff.setContactNumber(contactNumber);
+        staff.setRole(role);
+        // Password is NOT modified during edit operation
+        
+        return staffDAO.updateStaff(staff);
+    }
+
+    @Override
     public boolean deleteStaff(int staffId) {
         return staffDAO.deleteStaff(staffId);
     }
