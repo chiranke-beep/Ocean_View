@@ -3,6 +3,7 @@ package com.example.ocean_view_resort.dao.impl;
 import com.example.ocean_view_resort.dao.StaffDAO;
 import com.example.ocean_view_resort.model.Staff;
 import com.example.ocean_view_resort.utils.DatabaseConnection;
+import com.example.ocean_view_resort.utils.DatabaseResetUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -106,6 +107,9 @@ public class StaffDAOImpl implements StaffDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, staffId);
             int result = ps.executeUpdate();
+            if (result > 0) {
+                DatabaseResetUtil.resetAutoIncrementIfEmpty("staff");
+            }
             return result > 0;
         } catch (SQLException e) {
             e.printStackTrace();

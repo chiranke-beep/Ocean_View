@@ -83,6 +83,19 @@ public class AdminDashboardServlet extends HttpServlet {
             req.setAttribute("roomList", roomService.getAllRooms());
             req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
         }
+        else if ("edit-staff".equals(action)) {
+            int staffId = Integer.parseInt(req.getParameter("staffId"));
+            String name = req.getParameter("name");
+            String contactNumber = req.getParameter("contactNumber");
+            String role = req.getParameter("role");
+
+            // Edit without requiring password - update only name and contact
+            boolean result = staffService.editStaff(staffId, name, contactNumber, role);
+            req.setAttribute("message", result ? "Staff updated successfully!" : "Failed to update staff.");
+            req.setAttribute("staffList", staffService.getAllStaff());
+            req.setAttribute("roomList", roomService.getAllRooms());
+            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
+        }
         else if ("delete-staff".equals(action)) {
             int staffId = Integer.parseInt(req.getParameter("staffId"));
             boolean result = staffService.deleteStaff(staffId);

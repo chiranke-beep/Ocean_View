@@ -57,16 +57,25 @@ public class BillServlet extends HttpServlet {
                 return;
             }
 
-            // Get room price by room type
-            BigDecimal pricePerNight = roomDAO.getPriceByRoomType(reservation.getRoomType());
-
+            // Get room price - use actual room price if available, otherwise get average by room type
+            BigDecimal pricePerNight;
+            
             // Get room details if room_id exists
             String roomNumber = reservation.getRoomType(); // default to room type
+            com.example.ocean_view_resort.model.Room room = null;
+            
             if (reservation.getRoomId() > 0) {
-                com.example.ocean_view_resort.model.Room room = roomDAO.getRoomById(reservation.getRoomId());
+                room = roomDAO.getRoomById(reservation.getRoomId());
                 if (room != null) {
                     roomNumber = room.getRoomNumber();
+                    pricePerNight = BigDecimal.valueOf(room.getPricePerNight());
+                } else {
+                    // Fallback to room type average if room not found
+                    pricePerNight = roomDAO.getPriceByRoomType(reservation.getRoomType());
                 }
+            } else {
+                // No room_id, use room type average
+                pricePerNight = roomDAO.getPriceByRoomType(reservation.getRoomType());
             }
 
             // Calculate number of nights
@@ -281,7 +290,7 @@ public class BillServlet extends HttpServlet {
 
         contentStream.beginText();
         contentStream.newLineAtOffset(margin + 250, yPosition);
-        contentStream.showText("Rs. " + String.format("%.2f", bill.getPricePerNight()));
+        contentStream.showText("LKR " + String.format("%.2f", bill.getPricePerNight()));
         contentStream.endText();
 
         contentStream.beginText();
@@ -292,7 +301,7 @@ public class BillServlet extends HttpServlet {
         contentStream.beginText();
         contentStream.newLineAtOffset(margin + 430, yPosition);
         String amount = String.format("%.2f", bill.getPricePerNight().multiply(BigDecimal.valueOf(bill.getNumberOfNights())));
-        contentStream.showText("Rs. " + amount);
+        contentStream.showText("LKR " + amount);
         contentStream.endText();
 
         yPosition -= 15;
@@ -312,7 +321,7 @@ public class BillServlet extends HttpServlet {
         contentStream.setFont(fontBold, 12);
         contentStream.beginText();
         contentStream.newLineAtOffset(margin + 430, yPosition);
-        contentStream.showText("Rs. " + String.format("%.2f", bill.getTotalCost()));
+        contentStream.showText("LKR " + String.format("%.2f", bill.getTotalCost()));
         contentStream.endText();
 
         // Footer

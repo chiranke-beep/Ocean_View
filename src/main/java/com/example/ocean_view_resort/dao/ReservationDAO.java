@@ -8,6 +8,7 @@ public interface ReservationDAO {
     Reservation getReservationById(int reservationId);
     Reservation getReservationByNumber(String reservationNumber);
     List<Reservation> getAllReservations();
+    List<Reservation> getReservationsByGuestId(int guestId);
     void addReservation(Reservation reservation) throws SQLException;
     void updateReservation(Reservation reservation);
     void deleteReservation(int reservationId);

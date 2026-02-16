@@ -3,6 +3,7 @@ package com.example.ocean_view_resort.dao.impl;
 import com.example.ocean_view_resort.dao.GuestDAO;
 import com.example.ocean_view_resort.model.Guest;
 import com.example.ocean_view_resort.utils.DatabaseConnection;
+import com.example.ocean_view_resort.utils.DatabaseResetUtil;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -110,6 +111,7 @@ public class GuestDAOImpl implements GuestDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, guestId);
             stmt.executeUpdate();
+            DatabaseResetUtil.resetAutoIncrementIfEmpty("guest");
         } catch (SQLException e) {
             e.printStackTrace();
         }

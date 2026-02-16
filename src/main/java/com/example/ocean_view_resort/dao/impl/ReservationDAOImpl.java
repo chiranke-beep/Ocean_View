@@ -3,9 +3,9 @@ package com.example.ocean_view_resort.dao.impl;
 import com.example.ocean_view_resort.dao.ReservationDAO;
 import com.example.ocean_view_resort.model.Reservation;
 import com.example.ocean_view_resort.utils.DatabaseConnection;
+import com.example.ocean_view_resort.utils.DatabaseResetUtil;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +55,24 @@ public class ReservationDAOImpl implements ReservationDAO {
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 reservations.add(mapResultSetToReservation(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return reservations;
+    }
+
+    @Override
+    public List<Reservation> getReservationsByGuestId(int guestId) {
+        List<Reservation> reservations = new ArrayList<>();
+        String sql = "SELECT * FROM reservation WHERE guest_id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, guestId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reservations.add(mapResultSetToReservation(rs));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -118,6 +136,7 @@ public class ReservationDAOImpl implements ReservationDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, reservationId);
             stmt.executeUpdate();
+            DatabaseResetUtil.resetAutoIncrementIfEmpty("reservation");
         } catch (SQLException e) {
             e.printStackTrace();
         }
