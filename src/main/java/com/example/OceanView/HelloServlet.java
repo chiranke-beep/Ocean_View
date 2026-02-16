@@ -1,4 +1,4 @@
-package org.example.oceanview;
+package com.example.OceanView;
 
 import com.example.ocean_view_resort.utils.DatabaseConnection;
 import java.io.*;

@@ -6,8 +6,6 @@ import com.example.ocean_view_resort.model.Reservation;
 import com.example.ocean_view_resort.model.Room;
 import com.example.ocean_view_resort.service.ReservationService;
 import com.example.ocean_view_resort.service.RoomService;
-import com.example.ocean_view_resort.service.impl.RoomServiceImpl;
-
 import java.time.LocalDate;
 import java.util.List;
 

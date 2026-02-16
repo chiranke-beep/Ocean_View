@@ -175,13 +175,13 @@ public class RoomDAOImpl implements RoomDAO {
 
     @Override
     public BigDecimal getPriceByRoomType(String roomType) {
-        String sql = "SELECT AVG(price_per_night) as avg_price FROM room WHERE room_type = ?";
+        String sql = "SELECT price_per_night FROM room WHERE room_type = ? LIMIT 1";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roomType);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    double price = rs.getDouble("avg_price");
+                    double price = rs.getDouble("price_per_night");
                     if (price > 0) {
                         return BigDecimal.valueOf(price);
                     }

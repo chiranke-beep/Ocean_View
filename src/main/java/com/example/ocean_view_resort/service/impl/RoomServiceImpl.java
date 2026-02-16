@@ -5,6 +5,7 @@ import com.example.ocean_view_resort.dao.impl.RoomDAOImpl;
 import com.example.ocean_view_resort.model.Room;
 import com.example.ocean_view_resort.service.RoomService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -45,6 +46,14 @@ public class RoomServiceImpl implements RoomService {
         }
         
         return roomDAO.getAvailableRoomsByType(roomType, checkInDate, checkOutDate);
+    }
+
+    @Override
+    public BigDecimal getPriceByRoomType(String roomType) {
+        if (roomType == null || roomType.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return roomDAO.getPriceByRoomType(roomType);
     }
 
     @Override
