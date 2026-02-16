@@ -445,6 +445,9 @@
             <button class="tab-button" onclick="switchTab(event, 'view-tab')">
                 👁️ View All Reservations
             </button>
+            <button class="tab-button" onclick="switchTab(event, 'help-tab')">
+                ❓ Help & Instructions
+            </button>
         </div>
 
         <!-- Tab 1: Manage Guests -->
@@ -624,6 +627,75 @@
                     </table>
                 </div>
             <% } %>
+        </div>
+
+        <!-- Tab 4: Help & Instructions -->
+        <div id="help-tab" class="tab-content">
+            <h2 style="color: #333; margin-bottom: 20px;">Help & Instructions</h2>
+            <div style="background: #f5ede0; padding: 20px; border-radius: 10px; line-height: 1.8;">
+                
+                <h3 style="color: #d4a574; margin-top: 20px; margin-bottom: 10px;">📖 Using the Reservation System</h3>
+                <p style="color: #555; margin-bottom: 15px;">This guide will help you manage guest reservations and bookings effectively.</p>
+
+                <h4 style="color: #c49055; margin-top: 15px; margin-bottom: 8px;">1️⃣ Managing Guests</h4>
+                <ul style="color: #555; margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>Add New Guest:</strong> Click on the "Manage Guests" tab to add a new guest's information.</li>
+                    <li><strong>Required Fields:</strong> Guest Name, Contact Number, and Address must be filled.</li>
+                    <li><strong>Contact Number Format:</strong> Enter the phone number in international format (e.g., +94123456789).</li>
+                    <li><strong>Delete Guest:</strong> Click the Delete button next to a guest to remove them from the system.</li>
+                    <li><strong>Note:</strong> Add guests before creating reservations for them.</li>
+                </ul>
+
+                <h4 style="color: #c49055; margin-top: 15px; margin-bottom: 8px;">2️⃣ Making Reservations</h4>
+                <ul style="color: #555; margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>Select Guest:</strong> Choose an existing guest from the dropdown list.</li>
+                    <li><strong>Select Room Type:</strong> Choose from Single, Double, Deluxe, Suite, or Presidential rooms.</li>
+                    <li><strong>Check-In Date:</strong> Select the guest's arrival date (cannot be in the past).</li>
+                    <li><strong>Check-Out Date:</strong> Select the departure date (must be after check-in).</li>
+                    <li><strong>Select Room:</strong> Choose a specific available room. The system will show the room number and price.</li>
+                    <li><strong>Price Display:</strong> The total cost will be calculated and shown on screen (Rs per night × number of nights).</li>
+                    <li><strong>Confirm Booking:</strong> Click "Add Reservation" to complete the booking.</li>
+                </ul>
+
+                <h4 style="color: #c49055; margin-top: 15px; margin-bottom: 8px;">3️⃣ Viewing Reservations</h4>
+                <ul style="color: #555; margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>View All:</strong> Click on "View All Reservations" tab to see all bookings.</li>
+                    <li><strong>Reservation Details:</strong> Displays booking number, guest info, room type, dates, and status.</li>
+                    <li><strong>Download Bill:</strong> Click the "📥 Bill" button to download a PDF invoice.</li>
+                    <li><strong>Edit Reservation:</strong> Click the "✏️ Edit" button to modify room, dates, or other details.</li>
+                    <li><strong>Delete Reservation:</strong> Click "Delete" to cancel a booking (will ask for confirmation).</li>
+                </ul>
+
+                <h4 style="color: #c49055; margin-top: 15px; margin-bottom: 8px;">4️⃣ Important Notes</h4>
+                <ul style="color: #555; margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>Room Availability:</strong> Only available rooms will appear in the dropdown. Booked dates are automatically excluded.</li>
+                    <li><strong>Pricing:</strong> Prices are displayed in Sri Lankan Rupees (Rs).</li>
+                    <li><strong>Minimum Stay:</strong> Guests must stay at least 1 night. Check-out is always the day after check-in minimum.</li>
+                    <li><strong>Reservation Number:</strong> Each reservation gets a unique number (e.g., RES-0001) for reference.</li>
+                    <li><strong>Status:</strong> All new reservations are created with "Confirmed" status.</li>
+                    <li><strong>Room Status:</strong> The system automatically updates room status when reservations are created or deleted.</li>
+                </ul>
+
+                <h4 style="color: #c49055; margin-top: 15px; margin-bottom: 8px;">5️⃣ Bill Generation</h4>
+                <ul style="color: #555; margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>Download PDF:</strong> Click the "Bill" button to generate a professional invoice.</li>
+                    <li><strong>Bill Contents:</strong> Includes guest details, room information, dates, night count, and total charges.</li>
+                    <li><strong>Pricing Breakdown:</strong> Shows unit price, number of nights, and total amount due.</li>
+                    <li><strong>Guest Contact:</strong> Guest's phone number is included in the bill for reference.</li>
+                </ul>
+
+                <h4 style="color: #c49055; margin-top: 15px; margin-bottom: 8px;">❌ Troubleshooting</h4>
+                <ul style="color: #555; margin-left: 20px; margin-bottom: 15px;">
+                    <li><strong>No Rooms Available?</strong> Check if the selected dates have available rooms. Try different dates or room type.</li>
+                    <li><strong>Guest Not Found?</strong> Add the guest first in the "Manage Guests" tab before booking.</li>
+                    <li><strong>Cannot Edit Dates?</strong> Check-in must be today or later. Check-out must be after check-in.</li>
+                    <li><strong>Need Help?</strong> Contact your administrator or refer to this guide.</li>
+                </ul>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-top: 20px; border-left: 4px solid #ffc107;">
+                    <strong style="color: #856404;">💡 Tip:</strong> Always verify guest information and reservation details before confirming. Double-check dates to avoid overbooking.
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -7,7 +7,6 @@ public class Reservation {
     private int reservationId;
     private String reservationNumber; // Auto-generated: e.g., RES-001, RES-002
     private int guestId;
-    private int roomId; // Specific room being reserved
     private String roomType;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
@@ -17,12 +16,11 @@ public class Reservation {
     // Constructor
     public Reservation() {}
 
-    public Reservation(int reservationId, String reservationNumber, int guestId, int roomId, String roomType,
+    public Reservation(int reservationId, String reservationNumber, int guestId, String roomType,
                        LocalDate checkInDate, LocalDate checkOutDate, String status, LocalDateTime createdAt) {
         this.reservationId = reservationId;
         this.reservationNumber = reservationNumber;
         this.guestId = guestId;
-        this.roomId = roomId;
         this.roomType = roomType;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
@@ -53,14 +51,6 @@ public class Reservation {
 
     public void setGuestId(int guestId) {
         this.guestId = guestId;
-    }
-
-    public int getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
     }
 
     public String getRoomType() {
@@ -109,7 +99,6 @@ public class Reservation {
                 "reservationId=" + reservationId +
                 ", reservationNumber='" + reservationNumber + '\'' +
                 ", guestId=" + guestId +
-                ", roomId=" + roomId +
                 ", roomType='" + roomType + '\'' +
                 ", checkInDate=" + checkInDate +
                 ", checkOutDate=" + checkOutDate +

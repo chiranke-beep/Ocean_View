@@ -2,13 +2,10 @@ package com.example.ocean_view_resort.controller;
 
 import com.example.ocean_view_resort.model.Guest;
 import com.example.ocean_view_resort.model.Reservation;
-import com.example.ocean_view_resort.model.Room;
 import com.example.ocean_view_resort.service.GuestService;
 import com.example.ocean_view_resort.service.ReservationService;
-import com.example.ocean_view_resort.service.RoomService;
 import com.example.ocean_view_resort.service.impl.GuestServiceImpl;
 import com.example.ocean_view_resort.service.impl.ReservationServiceImpl;
-import com.example.ocean_view_resort.service.impl.RoomServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,7 +21,6 @@ import java.util.List;
 public class StaffDashboardServlet extends HttpServlet {
     private final GuestService guestService = new GuestServiceImpl();
     private final ReservationService reservationService = new ReservationServiceImpl();
-    private final RoomService roomService = new RoomServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,11 +41,9 @@ public class StaffDashboardServlet extends HttpServlet {
         // Load all reservations and guests
         List<Reservation> reservations = reservationService.getAllReservations();
         List<Guest> guests = guestService.getAllGuests();
-        List<Room> rooms = roomService.getAllRooms();
 
         req.setAttribute("reservations", reservations);
         req.setAttribute("guests", guests);
-        req.setAttribute("rooms", rooms);
         req.getRequestDispatcher("/staff-dashboard.jsp").forward(req, resp);
     }
 
@@ -96,99 +90,26 @@ public class StaffDashboardServlet extends HttpServlet {
 
             } else if ("add-reservation".equalsIgnoreCase(action)) {
                 int guestId = Integer.parseInt(req.getParameter("guestId"));
-                int roomId = Integer.parseInt(req.getParameter("roomId"));
                 String roomType = req.getParameter("roomType");
                 String checkInStr = req.getParameter("checkInDate");
                 String checkOutStr = req.getParameter("checkOutDate");
 
-                System.out.println("Adding reservation for guest ID: " + guestId + ", room ID: " + roomId);
+                System.out.println("Adding reservation for guest ID: " + guestId);
 
-                // Validate room exists and is of correct type
-                Room room = roomService.getRoomById(roomId);
-                if (room == null) {
-                    error = "Selected room not found!";
-                } else if (!room.getRoomType().equalsIgnoreCase(roomType)) {
-                    error = "Room type mismatch! Selected room is " + room.getRoomType();
-                } else {
-                    LocalDate checkInDate = LocalDate.parse(checkInStr);
-                    LocalDate checkOutDate = LocalDate.parse(checkOutStr);
-                    
-                    // Check if room is available for the dates
-                    List<Room> availableRooms = roomService.getAvailableRoomsByType(roomType, checkInDate, checkOutDate);
-                    boolean roomAvailable = availableRooms.stream().anyMatch(r -> r.getRoomId() == roomId);
-                    
-                    if (!roomAvailable) {
-                        error = "Selected room is not available for the requested dates!";
-                    } else {
-                        Reservation reservation = new Reservation();
-                        reservation.setGuestId(guestId);
-                        reservation.setRoomId(roomId);
-                        reservation.setRoomType(roomType);
-                        reservation.setCheckInDate(checkInDate);
-                        reservation.setCheckOutDate(checkOutDate);
-                        System.out.println("Adding reservation...");
-                        reservationService.addReservation(reservation);
-                        System.out.println("Reservation added with number: " + reservation.getReservationNumber());
-                        message = "Reservation added successfully! Reservation Number: " + reservation.getReservationNumber();
-                    }
-                }
+                Reservation reservation = new Reservation();
+                reservation.setGuestId(guestId);
+                reservation.setRoomType(roomType);
+                reservation.setCheckInDate(LocalDate.parse(checkInStr));
+                reservation.setCheckOutDate(LocalDate.parse(checkOutStr));
+                System.out.println("Adding reservation...");
+                reservationService.addReservation(reservation);
+                System.out.println("Reservation added with number: " + reservation.getReservationNumber());
+                message = "Reservation added successfully! Reservation Number: " + reservation.getReservationNumber();
 
             } else if ("delete-reservation".equalsIgnoreCase(action)) {
                 int reservationId = Integer.parseInt(req.getParameter("reservationId"));
                 reservationService.deleteReservation(reservationId);
                 message = "Reservation deleted successfully!";
-
-            } else if ("edit-reservation".equalsIgnoreCase(action)) {
-                int reservationId = Integer.parseInt(req.getParameter("reservationId"));
-                int guestId = Integer.parseInt(req.getParameter("guestId"));
-                int roomId = Integer.parseInt(req.getParameter("roomId"));
-                String roomType = req.getParameter("roomType");
-                String checkInStr = req.getParameter("checkInDate");
-                String checkOutStr = req.getParameter("checkOutDate");
-
-                System.out.println("Editing reservation ID: " + reservationId);
-
-                // Validate room exists and is of correct type
-                Room room = roomService.getRoomById(roomId);
-                if (room == null) {
-                    error = "Selected room not found!";
-                } else if (!room.getRoomType().equalsIgnoreCase(roomType)) {
-                    error = "Room type mismatch! Selected room is " + room.getRoomType();
-                } else {
-                    LocalDate checkInDate = LocalDate.parse(checkInStr);
-                    LocalDate checkOutDate = LocalDate.parse(checkOutStr);
-                    
-                    // Check if room is available for the dates
-                    List<Room> availableRooms = roomService.getAvailableRoomsByType(roomType, checkInDate, checkOutDate);
-                    
-                    // Get the current reservation to check if room is the same
-                    Reservation currentReservation = reservationService.getReservationById(reservationId);
-                    boolean roomAvailable = availableRooms.stream().anyMatch(r -> r.getRoomId() == roomId);
-                    
-                    // Room is available if it's the current room OR it's in the available list
-                    if (!roomAvailable && (currentReservation == null || currentReservation.getRoomId() != roomId)) {
-                        error = "Selected room is not available for the requested dates!";
-                    } else {
-                        Reservation reservation = new Reservation();
-                        reservation.setReservationId(reservationId);
-                        reservation.setGuestId(guestId);
-                        reservation.setRoomId(roomId);
-                        reservation.setRoomType(roomType);
-                        reservation.setCheckInDate(checkInDate);
-                        reservation.setCheckOutDate(checkOutDate);
-                        // Preserve the current status
-                        if (currentReservation != null) {
-                            reservation.setStatus(currentReservation.getStatus());
-                        } else {
-                            reservation.setStatus("Confirmed");
-                        }
-                        
-                        System.out.println("Updating reservation...");
-                        reservationService.updateReservation(reservation);
-                        System.out.println("Reservation updated successfully");
-                        message = "Reservation updated successfully!";
-                    }
-                }
             }
         } catch (IllegalArgumentException e) {
             error = "Validation error: " + e.getMessage();
@@ -207,11 +128,9 @@ public class StaffDashboardServlet extends HttpServlet {
         // Load all reservations and guests
         List<Reservation> reservations = reservationService.getAllReservations();
         List<Guest> guests = guestService.getAllGuests();
-        List<Room> rooms = roomService.getAllRooms();
 
         req.setAttribute("reservations", reservations);
         req.setAttribute("guests", guests);
-        req.setAttribute("rooms", rooms);
         req.setAttribute("message", message);
         req.setAttribute("error", error);
         req.getRequestDispatcher("/staff-dashboard.jsp").forward(req, resp);
