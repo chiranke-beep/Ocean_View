@@ -5,7 +5,6 @@ import com.example.ocean_view_resort.dao.impl.RoomDAOImpl;
 import com.example.ocean_view_resort.model.Room;
 import com.example.ocean_view_resort.service.RoomService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class RoomServiceImpl implements RoomService {
@@ -32,19 +31,6 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<Room> getAvailableRooms() {
         return roomDAO.getRoomsByStatus("Available");
-    }
-
-    @Override
-    public List<Room> getAvailableRoomsByType(String roomType, LocalDate checkInDate, LocalDate checkOutDate) {
-        if (roomType == null || roomType.isEmpty() || checkInDate == null || checkOutDate == null) {
-            return java.util.Collections.emptyList();
-        }
-        
-        if (checkInDate.isAfter(checkOutDate) || checkInDate.isEqual(checkOutDate)) {
-            return java.util.Collections.emptyList();
-        }
-        
-        return roomDAO.getAvailableRoomsByType(roomType, checkInDate, checkOutDate);
     }
 
     @Override

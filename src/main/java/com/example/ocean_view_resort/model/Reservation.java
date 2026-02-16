@@ -7,7 +7,7 @@ public class Reservation {
     private int reservationId;
     private String reservationNumber; // Auto-generated: e.g., RES-001, RES-002
     private int guestId;
-    private int roomId; // Specific room being reserved
+    private int roomId;
     private String roomType;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;

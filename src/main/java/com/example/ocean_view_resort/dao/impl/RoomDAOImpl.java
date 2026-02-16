@@ -4,12 +4,10 @@ import com.example.ocean_view_resort.dao.RoomDAO;
 import com.example.ocean_view_resort.model.Room;
 import com.example.ocean_view_resort.utils.DatabaseConnection;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,45 +82,6 @@ public class RoomDAOImpl implements RoomDAO {
     }
 
     @Override
-    public List<Room> getAvailableRoomsByType(String roomType, LocalDate checkInDate, LocalDate checkOutDate) {
-        List<Room> rooms = new ArrayList<>();
-        // Get all rooms of the specified type that don't have overlapping reservations
-        String sql = "SELECT DISTINCT r.* FROM room r " +
-                "WHERE r.room_type = ? " +
-                "AND r.room_id NOT IN (" +
-                "  SELECT DISTINCT res.room_id FROM reservation res " +
-                "  WHERE res.room_id IS NOT NULL " +
-                "  AND res.status != 'Cancelled' " +
-                "  AND (" +
-                "    (res.check_in_date < ? AND res.check_out_date > ?) " +
-                "    OR (res.check_in_date >= ? AND res.check_in_date < ?) " +
-                "    OR (res.check_out_date > ? AND res.check_out_date <= ?)" +
-                "  )" +
-                ")";
-        
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, roomType);
-            ps.setObject(2, checkOutDate);
-            ps.setObject(3, checkInDate);
-            ps.setObject(4, checkOutDate);
-            ps.setObject(5, checkInDate);
-            ps.setObject(6, checkInDate);
-            ps.setObject(7, checkOutDate);
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    rooms.add(mapResultSetToRoom(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Error getting available rooms: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return rooms;
-    }
-
-    @Override
     public boolean addRoom(Room room) {
         String sql = "INSERT INTO room (room_number, room_type, price_per_night, capacity, status) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -174,23 +133,20 @@ public class RoomDAOImpl implements RoomDAO {
     }
 
     @Override
-    public BigDecimal getPriceByRoomType(String roomType) {
-        String sql = "SELECT AVG(price_per_night) as avg_price FROM room WHERE room_type = ?";
+    public java.math.BigDecimal getPriceByRoomType(String roomType) {
+        String sql = "SELECT price_per_night FROM room WHERE room_type = ? LIMIT 1";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roomType);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    double price = rs.getDouble("avg_price");
-                    if (price > 0) {
-                        return BigDecimal.valueOf(price);
-                    }
+                    return java.math.BigDecimal.valueOf(rs.getDouble("price_per_night"));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return BigDecimal.ZERO;
+        return java.math.BigDecimal.ZERO;
     }
 
     private Room mapResultSetToRoom(ResultSet rs) throws SQLException {
