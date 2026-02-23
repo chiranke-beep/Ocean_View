@@ -7,59 +7,39 @@ public class Guest {
     private String name;
     private String address;
     private String contactNumber;
+    private String email;
     private LocalDateTime createdAt;
 
-    // Constructor
+    // Constructors
     public Guest() {}
 
-    public Guest(int guestId, String name, String address, String contactNumber, LocalDateTime createdAt) {
+    public Guest(int guestId, String name, String address, String contactNumber, String email, LocalDateTime createdAt) {
         this.guestId = guestId;
         this.name = name;
         this.address = address;
         this.contactNumber = contactNumber;
+        this.email = email;
         this.createdAt = createdAt;
     }
 
     // Getters and Setters
-    public int getGuestId() {
-        return guestId;
-    }
+    public int getGuestId() { return guestId; }
+    public void setGuestId(int guestId) { this.guestId = guestId; }
 
-    public void setGuestId(int guestId) {
-        this.guestId = guestId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getContactNumber() { return contactNumber; }
+    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
 
-    public String getAddress() {
-        return address;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     @Override
     public String toString() {
@@ -68,6 +48,7 @@ public class Guest {
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", contactNumber='" + contactNumber + '\'' +
+                ", email='" + email + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
     }

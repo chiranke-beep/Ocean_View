@@ -13,130 +13,122 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+/**
+ * Handles the Admin Dashboard UI and Staff/Room CRUD.
+ * Room list is now loaded client-side via /api/rooms.
+ * Staff list is still server-side (no public Staff API).
+ */
 @WebServlet(name = "AdminDashboardServlet", value = "/admin-dashboard")
 public class AdminDashboardServlet extends HttpServlet {
-    private StaffService staffService = new StaffServiceImpl();
-    private RoomService roomService = new RoomServiceImpl();
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(false);
-        
-        // Check if user is authenticated
-        if (session == null || session.getAttribute("username") == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
-            return;
-        }
+    private final StaffService staffService = new StaffServiceImpl();
+    private final RoomService  roomService  = new RoomServiceImpl();
 
-        String action = req.getParameter("action");
-        
-        if (action == null || action.isEmpty() || "home".equals(action)) {
-            // Load dashboard data
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        } else if ("staff-list".equals(action)) {
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        } else if ("room-list".equals(action)) {
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        } else {
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        }
+    private void forwardWithStaff(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        req.setAttribute("staffList", staffService.getAllStaff());
+        req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
         HttpSession session = req.getSession(false);
-        
+        if (session == null || session.getAttribute("username") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        // Rooms are fetched client-side; always load staff for the table
+        forwardWithStaff(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
         }
 
         String action = req.getParameter("action");
+        String message;
 
-        if ("add-staff".equals(action)) {
-            String name = req.getParameter("name");
-            String username = req.getParameter("username");
-            String password = req.getParameter("password");
-            String contactNumber = req.getParameter("contactNumber");
-            String role = req.getParameter("role");
+        switch (action == null ? "" : action) {
 
-            boolean result = staffService.addStaff(name, username, password, contactNumber, role);
-            req.setAttribute("message", result ? "Staff added successfully!" : "Failed to add staff. Username may already exist.");
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        } 
-        else if ("update-staff".equals(action)) {
-            int staffId = Integer.parseInt(req.getParameter("staffId"));
-            String name = req.getParameter("name");
-            String password = req.getParameter("password");
-            String contactNumber = req.getParameter("contactNumber");
-            String role = req.getParameter("role");
+            // ── Staff CRUD ────────────────────────────────────────────────────
+            case "add-staff": {
+                boolean ok = staffService.addStaff(
+                        req.getParameter("name"),
+                        req.getParameter("username"),
+                        req.getParameter("password"),
+                        req.getParameter("contactNumber"),
+                        req.getParameter("role"));
+                message = ok ? "Staff added successfully!" : "Failed to add staff. Username may already exist.";
+                break;
+            }
+            case "edit-staff": {
+                int staffId = Integer.parseInt(req.getParameter("staffId"));
+                boolean ok = staffService.editStaff(
+                        staffId,
+                        req.getParameter("name"),
+                        req.getParameter("contactNumber"),
+                        req.getParameter("role"));
+                message = ok ? "Staff updated successfully!" : "Failed to update staff.";
+                break;
+            }
+            case "update-staff": {
+                int staffId = Integer.parseInt(req.getParameter("staffId"));
+                boolean ok = staffService.updateStaff(
+                        staffId,
+                        req.getParameter("name"),
+                        req.getParameter("password"),
+                        req.getParameter("contactNumber"),
+                        req.getParameter("role"));
+                message = ok ? "Staff updated successfully!" : "Failed to update staff.";
+                break;
+            }
+            case "delete-staff": {
+                boolean ok = staffService.deleteStaff(Integer.parseInt(req.getParameter("staffId")));
+                message = ok ? "Staff deleted successfully!" : "Failed to delete staff.";
+                break;
+            }
 
-            boolean result = staffService.updateStaff(staffId, name, password, contactNumber, role);
-            req.setAttribute("message", result ? "Staff updated successfully!" : "Failed to update staff.");
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        }
-        else if ("edit-staff".equals(action)) {
-            int staffId = Integer.parseInt(req.getParameter("staffId"));
-            String name = req.getParameter("name");
-            String contactNumber = req.getParameter("contactNumber");
-            String role = req.getParameter("role");
+            // ── Room CRUD ─────────────────────────────────────────────────────
+            case "add-room": {
+                boolean ok = roomService.addRoom(
+                        req.getParameter("roomNumber"),
+                        req.getParameter("roomType"),
+                        Double.parseDouble(req.getParameter("pricePerNight")),
+                        Integer.parseInt(req.getParameter("capacity")));
+                message = ok ? "Room added successfully!" : "Failed to add room. Room number may already exist.";
+                break;
+            }
+            case "update-room": {
+                boolean ok = roomService.updateRoom(
+                        Integer.parseInt(req.getParameter("roomId")),
+                        req.getParameter("roomNumber"),
+                        req.getParameter("roomType"),
+                        Double.parseDouble(req.getParameter("pricePerNight")),
+                        Integer.parseInt(req.getParameter("capacity")),
+                        req.getParameter("status"));
+                message = ok ? "Room updated successfully!" : "Failed to update room.";
+                break;
+            }
+            case "delete-room": {
+                boolean ok = roomService.deleteRoom(Integer.parseInt(req.getParameter("roomId")));
+                message = ok ? "Room deleted successfully!" : "Failed to delete room.";
+                break;
+            }
 
-            // Edit without requiring password - update only name and contact
-            boolean result = staffService.editStaff(staffId, name, contactNumber, role);
-            req.setAttribute("message", result ? "Staff updated successfully!" : "Failed to update staff.");
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
+            default:
+                message = "";
         }
-        else if ("delete-staff".equals(action)) {
-            int staffId = Integer.parseInt(req.getParameter("staffId"));
-            boolean result = staffService.deleteStaff(staffId);
-            req.setAttribute("message", result ? "Staff deleted successfully!" : "Failed to delete staff.");
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        }
-        else if ("add-room".equals(action)) {
-            String roomNumber = req.getParameter("roomNumber");
-            String roomType = req.getParameter("roomType");
-            double pricePerNight = Double.parseDouble(req.getParameter("pricePerNight"));
-            int capacity = Integer.parseInt(req.getParameter("capacity"));
 
-            boolean result = roomService.addRoom(roomNumber, roomType, pricePerNight, capacity);
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("message", result ? "Room added successfully!" : "Failed to add room. Room number may already exist.");
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        }
-        else if ("update-room".equals(action)) {
-            int roomId = Integer.parseInt(req.getParameter("roomId"));
-            String roomNumber = req.getParameter("roomNumber");
-            String roomType = req.getParameter("roomType");
-            double pricePerNight = Double.parseDouble(req.getParameter("pricePerNight"));
-            int capacity = Integer.parseInt(req.getParameter("capacity"));
-            String status = req.getParameter("status");
-
-            boolean result = roomService.updateRoom(roomId, roomNumber, roomType, pricePerNight, capacity, status);
-            req.setAttribute("message", result ? "Room updated successfully!" : "Failed to update room.");
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        }
-        else if ("delete-room".equals(action)) {
-            int roomId = Integer.parseInt(req.getParameter("roomId"));
-            boolean result = roomService.deleteRoom(roomId);
-            req.setAttribute("message", result ? "Room deleted successfully!" : "Failed to delete room.");
-            req.setAttribute("staffList", staffService.getAllStaff());
-            req.setAttribute("roomList", roomService.getAllRooms());
-            req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
-        }
+        req.setAttribute("message", message);
+        forwardWithStaff(req, resp);
     }
 }

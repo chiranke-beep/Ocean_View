@@ -64,17 +64,17 @@ public class GuestDAOImpl implements GuestDAO {
 
     @Override
     public void addGuest(Guest guest) throws SQLException {
-        String sql = "INSERT INTO guest (name, address, contact_number, created_at) VALUES (?, ?, ?, ?)";
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        try (PreparedStatement stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO guest (name, address, contact_number, email, created_at) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, guest.getName());
             stmt.setString(2, guest.getAddress());
             stmt.setString(3, guest.getContactNumber());
-            stmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setString(4, guest.getEmail());
+            stmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
             int result = stmt.executeUpdate();
             System.out.println("Guest insert result: " + result);
-            
-            // Get the generated guest_id
+
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int guestId = generatedKeys.getInt(1);
@@ -91,13 +91,14 @@ public class GuestDAOImpl implements GuestDAO {
 
     @Override
     public void updateGuest(Guest guest) {
-        String sql = "UPDATE guest SET name = ?, address = ?, contact_number = ? WHERE guest_id = ?";
+        String sql = "UPDATE guest SET name = ?, address = ?, contact_number = ?, email = ? WHERE guest_id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, guest.getName());
             stmt.setString(2, guest.getAddress());
             stmt.setString(3, guest.getContactNumber());
-            stmt.setInt(4, guest.getGuestId());
+            stmt.setString(4, guest.getEmail());
+            stmt.setInt(5, guest.getGuestId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -123,6 +124,7 @@ public class GuestDAOImpl implements GuestDAO {
                 rs.getString("name"),
                 rs.getString("address"),
                 rs.getString("contact_number"),
+                rs.getString("email"),
                 rs.getTimestamp("created_at").toLocalDateTime()
         );
     }

@@ -44,9 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
                 reservation.getCheckOutDate().equals(reservation.getCheckInDate())) {
             throw new IllegalArgumentException("Check-out date must be after check-in date");
         }
-        if (reservation.getCheckInDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Check-in date cannot be in the past");
-        }
+
 
         try {
             // Generate reservation number

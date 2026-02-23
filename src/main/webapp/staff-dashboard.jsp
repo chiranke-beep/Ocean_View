@@ -1,1194 +1,1031 @@
-<%@ page import="java.util.List" %>
-<%@ page import="com.example.ocean_view_resort.model.Reservation" %>
-<%@ page import="com.example.ocean_view_resort.model.Guest" %>
-<%@ page import="com.example.ocean_view_resort.model.Room" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--@formatter:off--%>
+    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+        <% String username=(String) session.getAttribute("username"); String role=(String) session.getAttribute("role");
+            if (username==null || role==null || !"Staff".equalsIgnoreCase(role)) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp" ); return; } String message=(String)
+            request.getAttribute("message"); String error=(String) request.getAttribute("error"); String
+            ctx=request.getContextPath(); %>
+            <!DOCTYPE html>
+            <html lang="en">
 
-<%
-    // Check if user is logged in
-    String username = (String) session.getAttribute("username");
-    String role = (String) session.getAttribute("role");
-    if (username == null || role == null || !"Staff".equalsIgnoreCase(role)) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Staff Dashboard - Ocean View Resort</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+                    rel="stylesheet">
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
 
-    List<Reservation> reservations = (List<Reservation>) request.getAttribute("reservations");
-    List<Guest> guests = (List<Guest>) request.getAttribute("guests");
-    List<Room> rooms = (List<Room>) request.getAttribute("rooms");
-    String message = (String) request.getAttribute("message");
-    String error = (String) request.getAttribute("error");
+                    body {
+                        font-family: 'Inter', sans-serif;
+                        background: linear-gradient(135deg, #f5ede0 0%, #e8dcc8 100%);
+                        min-height: 100vh;
+                        padding: 20px;
+                    }
 
-    if (reservations == null) reservations = new java.util.ArrayList<>();
-    if (guests == null) guests = new java.util.ArrayList<>();
-    if (rooms == null) rooms = new java.util.ArrayList<>();
-%>
+                    .container {
+                        max-width: 1200px;
+                        margin: 0 auto;
+                        background: #fff;
+                        border-radius: 10px;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+                        overflow: hidden;
+                    }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Dashboard - Ocean View Resort</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+                    .navbar {
+                        background: linear-gradient(135deg, #d4a574 0%, #c49055 100%);
+                        color: #fff;
+                        padding: 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5ede0 0%, #e8dcc8 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+                    .navbar h1 {
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
+                    .navbar-right {
+                        display: flex;
+                        gap: 20px;
+                        align-items: center;
+                    }
 
-        /* Navbar */
-        .navbar {
-            background: linear-gradient(135deg, #d4a574 0%, #c49055 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+                    .username {
+                        font-size: 14px;
+                        opacity: .9;
+                    }
 
-        .navbar h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
+                    .logout-btn {
+                        background: #b8785f;
+                        color: #fff;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        text-decoration: none;
+                        transition: background .3s;
+                    }
 
-        .navbar-right {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
+                    .logout-btn:hover {
+                        background: #a06c50;
+                    }
 
-        .username {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+                    .content {
+                        padding: 30px;
+                    }
 
-        .logout-btn {
-            background: #b8785f;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
-            transition: background 0.3s ease;
-        }
+                    .tabs {
+                        display: flex;
+                        gap: 10px;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #e8dcc8;
+                    }
 
-        .logout-btn:hover {
-            background: #a06c50;
-        }
+                    .tab-button {
+                        background: none;
+                        border: none;
+                        padding: 15px 20px;
+                        font-size: 16px;
+                        font-weight: 500;
+                        color: #c49055;
+                        cursor: pointer;
+                        border-bottom: 3px solid transparent;
+                        transition: all .3s;
+                    }
 
-        /* Content */
-        .content {
-            padding: 30px;
-        }
+                    .tab-button.active,
+                    .tab-button:hover {
+                        color: #d4a574;
+                        border-bottom-color: #d4a574;
+                    }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e8dcc8;
-        }
+                    .tab-content {
+                        display: none;
+                    }
 
-        .tab-button {
-            background: none;
-            border: none;
-            padding: 15px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            color: #c49055;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
+                    .tab-content.active {
+                        display: block;
+                    }
 
-        .tab-button.active {
-            color: #d4a574;
-            border-bottom-color: #d4a574;
-        }
+                    .alert {
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        border-radius: 5px;
+                    }
 
-        .tab-button:hover {
-            color: #d4a574;
-        }
+                    .alert-success {
+                        background: #d4edda;
+                        color: #155724;
+                        border: 1px solid #c3e6cb;
+                    }
 
-        .tab-content {
-            display: none;
-        }
+                    .alert-error {
+                        background: #f8d7da;
+                        color: #721c24;
+                        border: 1px solid #f5c6cb;
+                    }
 
-        .tab-content.active {
-            display: block;
-        }
+                    .form-group {
+                        margin-bottom: 20px;
+                    }
 
-        /* Messages */
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            animation: slideDown 0.5s ease;
-        }
+                    label {
+                        display: block;
+                        margin-bottom: 5px;
+                        color: #333;
+                        font-weight: 500;
+                        font-size: 14px;
+                    }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+                    input,
+                    select {
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        font-family: 'Inter', sans-serif;
+                        transition: border-color .3s;
+                    }
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+                    input:focus,
+                    select:focus {
+                        outline: none;
+                        border-color: #d4a574;
+                        box-shadow: 0 0 0 3px rgba(212, 165, 116, .1);
+                    }
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+                    .form-row {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 20px;
+                    }
 
-        /* Forms */
-        .form-group {
-            margin-bottom: 20px;
-        }
+                    .submit-btn {
+                        background: linear-gradient(135deg, #d4a574 0%, #c49055 100%);
+                        color: #fff;
+                        border: none;
+                        padding: 12px 30px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                        transition: transform .2s, box-shadow .2s;
+                    }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
+                    .submit-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, .2);
+                    }
 
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            transition: border-color 0.3s ease;
-        }
+                    .table-container {
+                        overflow-x: auto;
+                        margin-top: 30px;
+                    }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: #d4a574;
-            box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
-        }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+                    thead {
+                        background: #f5ede0;
+                    }
 
-        .submit-btn {
-            background: linear-gradient(135deg, #d4a574 0%, #c49055 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+                    th {
+                        padding: 15px;
+                        text-align: left;
+                        color: #333;
+                        font-weight: 600;
+                        border-bottom: 2px solid #ddd;
+                    }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
+                    td {
+                        padding: 15px;
+                        border-bottom: 1px solid #eee;
+                    }
 
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-            margin-top: 30px;
-        }
+                    tbody tr:hover {
+                        background: #f9f7f4;
+                    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
+                    .delete-btn {
+                        background: #d32f2f;
+                        color: #fff;
+                        border: none;
+                        padding: 8px 15px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 13px;
+                        transition: background .3s;
+                    }
 
-        thead {
-            background: #f5ede0;
-        }
+                    .delete-btn:hover {
+                        background: #b71c1c;
+                    }
 
-        th {
-            padding: 15px;
-            text-align: left;
-            color: #333;
-            font-weight: 600;
-            border-bottom: 2px solid #ddd;
-        }
+                    .download-btn {
+                        background: #2196F3;
+                        color: #fff;
+                        border: none;
+                        padding: 8px 15px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 13px;
+                        text-decoration: none;
+                        display: inline-block;
+                        margin-right: 5px;
+                        transition: background .3s;
+                    }
 
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
+                    .download-btn:hover {
+                        background: #0b7dda;
+                    }
 
-        tbody tr:hover {
-            background: #f9f7f4;
-        }
+                    .edit-btn {
+                        background: #ff9800;
+                        color: #fff;
+                        border: none;
+                        padding: 8px 15px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 13px;
+                        margin-right: 5px;
+                        transition: background .3s;
+                    }
 
-        .delete-btn {
-            background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.3s ease;
-        }
+                    .edit-btn:hover {
+                        background: #e68900;
+                    }
 
-        .delete-btn:hover {
-            background: #b71c1c;
-        }
+                    .action-btns {
+                        display: flex;
+                        gap: 6px;
+                        align-items: center;
+                        flex-wrap: wrap;
+                    }
 
-        .download-btn {
-            background: #2196F3;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            text-decoration: none;
-            display: inline-block;
-            transition: background 0.3s ease;
-            margin-right: 5px;
-        }
+                    .empty-message {
+                        text-align: center;
+                        padding: 40px;
+                        color: #999;
+                        font-style: italic;
+                    }
 
-        .download-btn:hover {
-            background: #0b7dda;
-        }
+                    .modal {
+                        display: none;
+                        position: fixed;
+                        z-index: 1000;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, .4);
+                    }
 
-        .edit-btn {
-            background: #ff9800;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.3s ease;
-            margin-right: 5px;
-        }
+                    .modal-content {
+                        background: #fff;
+                        margin: 5% auto;
+                        padding: 30px;
+                        border-radius: 10px;
+                        box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+                        width: 90%;
+                        max-width: 600px;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                    }
 
-        .edit-btn:hover {
-            background: #e68900;
-        }
+                    .modal-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #f5ede0;
+                        padding-bottom: 15px;
+                    }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
+                    .modal-header h2 {
+                        font-size: 20px;
+                        color: #333;
+                    }
 
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+                    .modal-close {
+                        background: none;
+                        border: none;
+                        font-size: 28px;
+                        cursor: pointer;
+                        color: #999;
+                    }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f5ede0;
-            padding-bottom: 15px;
-        }
+                    .modal-close:hover {
+                        color: #333;
+                    }
 
-        .modal-header h2 {
-            font-size: 20px;
-            color: #333;
-        }
+                    .modal-footer {
+                        display: flex;
+                        gap: 10px;
+                        justify-content: flex-end;
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #eee;
+                    }
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #999;
-            transition: color 0.3s ease;
-        }
+                    .cancel-btn {
+                        background: #999;
+                        color: #fff;
+                        border: none;
+                        padding: 10px 25px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                    }
 
-        .modal-close:hover {
-            color: #333;
-        }
+                    .cancel-btn:hover {
+                        background: #777;
+                    }
 
-        .modal-body {
-            margin-top: 20px;
-        }
+                    #priceDisplay,
+                    #editPriceDisplay {
+                        background: #f5ede0;
+                        padding: 15px 20px;
+                        border-radius: 6px;
+                        margin: 15px 0;
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #c49055;
+                        border-left: 4px solid #d4a574;
+                        display: none;
+                    }
 
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
+                    @media(max-width:768px) {
+                        .form-row {
+                            grid-template-columns: 1fr;
+                        }
 
-        .cancel-btn {
-            background: #999;
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s ease;
-        }
+                        .navbar {
+                            flex-direction: column;
+                            gap: 10px;
+                        }
 
-        .cancel-btn:hover {
-            background: #777;
-        }
+                        table {
+                            font-size: 12px;
+                        }
 
-        .empty-message {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-style: italic;
-        }
+                        th,
+                        td {
+                            padding: 10px;
+                        }
+                    }
+                </style>
+            </head>
 
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .navbar-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <!-- Navbar -->
-    <div class="navbar">
-        <h1>🏨 Ocean View Resort - Staff Dashboard</h1>
-        <div class="navbar-right">
-            <span class="username">Staff: <%= username %></span>
-            <a href="<%= request.getContextPath() %>/logout" class="logout-btn">Logout</a>
-        </div>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-        <!-- Messages -->
-        <% if (message != null && !message.isEmpty()) { %>
-            <div class="alert alert-success"><%= message %></div>
-        <% } %>
-        <% if (error != null && !error.isEmpty()) { %>
-            <div class="alert alert-error"><%= error %></div>
-        <% } %>
-
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-button active" onclick="switchTab(event, 'guests-tab')">
-                👥 Manage Guests
-            </button>
-            <button class="tab-button" onclick="switchTab(event, 'reservations-tab')">
-                📋 Manage Reservations
-            </button>
-            <button class="tab-button" onclick="switchTab(event, 'view-tab')">
-                👁️ View All Reservations
-            </button>
-            <button class="tab-button" onclick="switchTab(event, 'help-tab')">
-                ❓ Help & Instructions
-            </button>
-        </div>
-
-        <!-- Tab 1: Manage Guests -->
-        <div id="guests-tab" class="tab-content active">
-            <h2 style="color: #333; margin-bottom: 20px;">Add New Guest</h2>
-            <form method="post" action="<%= request.getContextPath() %>/staff-dashboard">
-                <input type="hidden" name="action" value="add-guest">
-
-                <div class="form-group">
-                    <label for="guestName">Guest Name *</label>
-                    <input type="text" id="guestName" name="guestName" required minlength="3">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="contactNumber">Contact Number *</label>
-                        <input type="tel" id="contactNumber" name="contactNumber" required>
+            <body>
+                <div class="container">
+                    <div class="navbar">
+                        <h1>&#127968; Ocean View Resort - Staff Dashboard</h1>
+                        <div class="navbar-right">
+                            <span class="username">Staff: <%= username %></span>
+                            <a href="<%= ctx %>/logout" class="logout-btn">Logout</a>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="address">Address *</label>
-                        <input type="text" id="address" name="address" required minlength="5">
-                    </div>
-                </div>
 
-                <button type="submit" class="submit-btn">✓ Add Guest</button>
-            </form>
+                    <div class="content">
+                        <% if (message !=null && !message.isEmpty()) { %>
+                            <div class="alert alert-success">
+                                <%= message %>
+                            </div>
+                            <% } %>
+                                <% if (error !=null && !error.isEmpty()) { %>
+                                    <div class="alert alert-error">
+                                        <%= error %>
+                                    </div>
+                                    <% } %>
 
-            <h2 style="color: #333; margin-top: 40px; margin-bottom: 20px;">All Guests</h2>
-            <% if (guests.isEmpty()) { %>
-                <div class="empty-message">No guests found. Start adding guests!</div>
-            <% } else { %>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Guest ID</th>
-                                <th>Guest Name</th>
-                                <th>Contact</th>
-                                <th>Address</th>
-                                <th>Added On</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (Guest guest : guests) { %>
-                                <tr>
-                                    <td><strong><%= guest.getGuestId() %></strong></td>
-                                    <td><%= guest.getName() %></td>
-                                    <td><%= guest.getContactNumber() %></td>
-                                    <td><%= guest.getAddress() %></td>
-                                    <td><%= guest.getCreatedAt() %></td>
-                                    <td>
-                                        <div class="action-btns">
-                                            <button type="button" class="edit-btn" onclick="openEditGuestModal(<%= guest.getGuestId() %>, '<%= guest.getName() %>', '<%= guest.getContactNumber() %>', '<%= guest.getAddress() %>')" title="Edit Guest">✏️ Edit</button>
-                                            <form method="post" action="<%= request.getContextPath() %>/staff-dashboard" style="display: inline;">
-                                                <input type="hidden" name="action" value="delete-guest">
-                                                <input type="hidden" name="guestId" value="<%= guest.getGuestId() %>">
-                                                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure?');">Delete</button>
+                                        <div class="tabs">
+                                            <button class="tab-button active"
+                                                onclick="switchTab(event,'guests-tab')">&#128101; Manage Guests</button>
+                                            <button class="tab-button"
+                                                onclick="switchTab(event,'reservations-tab')">&#128203; Manage
+                                                Reservations</button>
+                                            <button class="tab-button" onclick="switchTab(event,'view-tab')">&#128065;
+                                                View All Reservations</button>
+                                            <button class="tab-button" onclick="switchTab(event,'help-tab')">&#10067;
+                                                Help &amp; Instructions</button>
+                                        </div>
+
+                                        <!-- Tab 1: Manage Guests -->
+                                        <div id="guests-tab" class="tab-content active">
+                                            <h2 style="color:#333;margin-bottom:20px;">Add New Guest</h2>
+                                            <form method="post" action="<%= ctx %>/staff-dashboard">
+                                                <input type="hidden" name="action" value="add-guest">
+                                                <div class="form-group">
+                                                    <label for="guestName">Guest Name *</label>
+                                                    <input type="text" id="guestName" name="guestName" required
+                                                        minlength="3">
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group">
+                                                        <label for="contactNumber">Contact Number *</label>
+                                                        <input type="tel" id="contactNumber" name="contactNumber"
+                                                            required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="address">Address *</label>
+                                                        <input type="text" id="address" name="address" required
+                                                            minlength="5">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="email">Email Address</label>
+                                                    <input type="email" id="email" name="email"
+                                                        placeholder="guest@example.com">
+                                                </div>
+                                                <button type="submit" class="submit-btn">&#10003; Add Guest</button>
+                                            </form>
+
+                                            <h2 style="color:#333;margin-top:40px;margin-bottom:20px;">All Guests</h2>
+                                            <div class="table-container">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Guest ID</th>
+                                                            <th>Guest Name</th>
+                                                            <th>Contact</th>
+                                                            <th>Email</th>
+                                                            <th>Address</th>
+                                                            <th>Added On</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="guestsTableBody">
+                                                        <tr>
+                                                            <td colspan="7" style="text-align:center;color:#999;">
+                                                                Loading guests...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tab 2: Add Reservation -->
+                                        <div id="reservations-tab" class="tab-content">
+                                            <h2 style="color:#333;margin-bottom:20px;">Add New Reservation</h2>
+                                            <form method="post" action="<%= ctx %>/staff-dashboard">
+                                                <input type="hidden" name="action" value="add-reservation">
+                                                <div class="form-group">
+                                                    <label for="guestId">Select Guest *</label>
+                                                    <select id="guestId" name="guestId" required>
+                                                        <option value="">-- Loading guests... --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group">
+                                                        <label for="roomType">Room Type *</label>
+                                                        <select id="roomType" name="roomType" required>
+                                                            <option value="">-- Select Room Type --</option>
+                                                            <option value="Single">Single</option>
+                                                            <option value="Double">Double</option>
+                                                            <option value="Deluxe">Deluxe</option>
+                                                            <option value="Suite">Suite</option>
+                                                            <option value="Presidential">Presidential</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="roomId">Select Room *</label>
+                                                        <select id="roomId" name="roomId" required>
+                                                            <option value="">-- Select a Room --</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div id="priceDisplay"><!-- price --></div>
+                                                <div class="form-row">
+                                                    <div class="form-group">
+                                                        <label for="checkInDate">Check-In Date *</label>
+                                                        <input type="date" id="checkInDate" name="checkInDate" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="checkOutDate">Check-Out Date *</label>
+                                                        <input type="date" id="checkOutDate" name="checkOutDate"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" class="submit-btn">&#10003; Add
+                                                    Reservation</button>
                                             </form>
                                         </div>
-                                    </td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            <% } %>
-        </div>
 
-        <!-- Tab 2: Add Reservation -->
-        <div id="reservations-tab" class="tab-content">
-            <h2 style="color: #333; margin-bottom: 20px;">Add New Reservation</h2>
-            <% if (guests.isEmpty()) { %>
-                <div class="alert alert-error">Please add guests first before creating reservations!</div>
-            <% } else { %>
-                <form method="post" action="<%= request.getContextPath() %>/staff-dashboard">
-                    <input type="hidden" name="action" value="add-reservation">
+                                        <!-- Tab 3: View All Reservations -->
+                                        <div id="view-tab" class="tab-content">
+                                            <h2 style="color:#333;margin-bottom:20px;">All Reservations</h2>
+                                            <div class="table-container">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Res. No.</th>
+                                                            <th>Guest Name</th>
+                                                            <th>Contact</th>
+                                                            <th>Email</th>
+                                                            <th>Room Type</th>
+                                                            <th>Check-In</th>
+                                                            <th>Check-Out</th>
+                                                            <th>Status</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="reservationsTableBody">
+                                                        <tr>
+                                                            <td colspan="8" style="text-align:center;color:#999;">
+                                                                Loading reservations...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
 
-                    <div class="form-group">
-                        <label for="guestId">Select Guest *</label>
-                        <select id="guestId" name="guestId" required>
-                            <option value="">-- Select a Guest --</option>
-                            <% for (Guest guest : guests) { %>
-                                <option value="<%= guest.getGuestId() %>">
-                                    <%= guest.getName() %> (<%= guest.getContactNumber() %>)
-                                </option>
-                            <% } %>
-                        </select>
+                                        <!-- Tab 4: Help -->
+                                        <div id="help-tab" class="tab-content">
+                                            <h2 style="color:#333;margin-bottom:10px;">&#128214; Help &amp; Instructions
+                                            </h2>
+                                            <p style="color:#666;margin-bottom:25px;font-size:14px;">Welcome! This guide
+                                                will help you efficiently manage guest reservations.</p>
+
+                                            <div
+                                                style="margin-bottom:25px;padding:20px;background:#f5ede0;border-left:4px solid #d4a574;border-radius:5px;">
+                                                <h3 style="color:#c49055;margin-bottom:12px;">1&#65039;&#8419; Managing
+                                                    Guests</h3>
+                                                <ul style="color:#333;margin-left:20px;line-height:1.8;">
+                                                    <li><strong>Click "Manage Guests" tab</strong> to access the guest
+                                                        management section</li>
+                                                    <li><strong>Guest Name:</strong> Enter the full name (minimum 3
+                                                        characters)</li>
+                                                    <li><strong>Contact Number:</strong> Phone number for communication
+                                                    </li>
+                                                    <li><strong>Address:</strong> Complete residential address (minimum
+                                                        5 characters)</li>
+                                                    <li><strong>Delete Guest:</strong> Use the Delete button to remove a
+                                                        guest</li>
+                                                </ul>
+                                            </div>
+
+                                            <div
+                                                style="margin-bottom:25px;padding:20px;background:#f5ede0;border-left:4px solid #d4a574;border-radius:5px;">
+                                                <h3 style="color:#c49055;margin-bottom:12px;">2&#65039;&#8419; Making
+                                                    Reservations</h3>
+                                                <ol style="color:#333;margin-left:20px;line-height:1.9;">
+                                                    <li>Go to <strong>"Manage Reservations"</strong> tab</li>
+                                                    <li>Select a guest from the dropdown (add guests first if empty)
+                                                    </li>
+                                                    <li>Choose room type, check-in and check-out dates</li>
+                                                    <li>Available rooms load automatically based on type and dates</li>
+                                                    <li>Select a room and click <strong>"&#10003; Add
+                                                            Reservation"</strong></li>
+                                                </ol>
+                                            </div>
+
+                                            <div
+                                                style="margin-bottom:25px;padding:20px;background:#f5ede0;border-left:4px solid #d4a574;border-radius:5px;">
+                                                <h3 style="color:#c49055;margin-bottom:12px;">3&#65039;&#8419; Viewing
+                                                    &amp; Managing Reservations</h3>
+                                                <ul style="color:#333;margin-left:20px;line-height:1.8;">
+                                                    <li><strong>&#128229; Bill:</strong> Download a PDF bill for any
+                                                        reservation</li>
+                                                    <li><strong>&#9999;&#65039; Edit:</strong> Modify room, dates, or
+                                                        other details</li>
+                                                    <li><strong>Delete:</strong> Cancel the reservation completely</li>
+                                                </ul>
+                                            </div>
+
+                                            <div
+                                                style="padding:15px;background:#d4edda;border:1px solid #c3e6cb;border-radius:5px;color:#155724;">
+                                                <strong>Need more help?</strong> Contact the management team or refer to
+                                                the hotel operations manual.
+                                            </div>
+                                        </div>
                     </div>
+                </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="roomType">Room Type *</label>
-                            <select id="roomType" name="roomType" required onchange="updateRoomList()">
-                                <option value="">-- Select Room Type --</option>
-                                <option value="Single">Single</option>
-                                <option value="Double">Double</option>
-                                <option value="Deluxe">Deluxe</option>
-                                <option value="Suite">Suite</option>
-                                <option value="Presidential">Presidential</option>
-                            </select>
+                <!-- Edit Reservation Modal -->
+                <div id="editModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Edit Reservation</h2>
+                            <button class="modal-close" onclick="closeEditModal()">&times;</button>
                         </div>
-                        <div class="form-group">
-                            <label for="roomId">Select Room *</label>
-                            <select id="roomId" name="roomId" required onchange="updatePrice()">
-                                <option value="">-- Select a Room --</option>
-                            </select>
+                        <div class="modal-body">
+                            <form method="post" action="<%= ctx %>/staff-dashboard" id="editForm">
+                                <input type="hidden" name="action" value="edit-reservation">
+                                <input type="hidden" id="editReservationId" name="reservationId">
+                                <input type="hidden" id="editGuestId" name="guestId">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editRoomType">Room Type:</label>
+                                        <select id="editRoomType" name="roomType" required>
+                                            <option value="">-- Select Room Type --</option>
+                                            <option value="Single">Single</option>
+                                            <option value="Double">Double</option>
+                                            <option value="Deluxe">Deluxe</option>
+                                            <option value="Suite">Suite</option>
+                                            <option value="Presidential">Presidential</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editRoomId">Room (LKR):</label>
+                                        <select id="editRoomId" name="roomId" required>
+                                            <option value="">-- Select a Room --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editCheckInDate">Check-In Date:</label>
+                                        <input type="date" id="editCheckInDate" name="checkInDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editCheckOutDate">Check-Out Date:</label>
+                                        <input type="date" id="editCheckOutDate" name="checkOutDate" required>
+                                    </div>
+                                </div>
+                                <div id="editPriceDisplay"><!-- price --></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+                            <button type="submit" form="editForm" class="submit-btn">Save Changes</button>
                         </div>
                     </div>
-
-                    <div id="priceDisplay" style="background: #f5ede0; padding: 15px 20px; border-radius: 6px; margin: 15px 0; font-size: 16px; font-weight: 600; color: #c49055; width: 100%; text-align: left; border-left: 4px solid #d4a574; display: none;"><!-- Price will be shown here in LKR --></div>
-
-                    <div class="form-group">
-                        <label for="checkInDate">Check-In Date *</label>
-                        <input type="date" id="checkInDate" name="checkInDate" required onchange="updateRoomList()">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="checkOutDate">Check-Out Date *</label>
-                        <input type="date" id="checkOutDate" name="checkOutDate" required onchange="updateRoomList()">
-                    </div>
-
-                    <button type="submit" class="submit-btn">✓ Add Reservation</button>
-                </form>
-            <% } %>
-        </div>
-
-        <!-- Tab 3: View All Reservations -->
-        <div id="view-tab" class="tab-content">
-            <h2 style="color: #333; margin-bottom: 20px;">All Reservations</h2>
-
-            <% if (reservations.isEmpty()) { %>
-                <div class="empty-message">No reservations found. Start adding new reservations!</div>
-            <% } else { %>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Res. No.</th>
-                                <th>Guest Name</th>
-                                <th>Contact</th>
-                                <th>Room Type</th>
-                                <th>Check-In</th>
-                                <th>Check-Out</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (Reservation res : reservations) {
-                                Guest resGuest = guests.stream()
-                                    .filter(g -> g.getGuestId() == res.getGuestId())
-                                    .findFirst()
-                                    .orElse(null);
-                            %>
-                                <tr>
-                                    <td><strong><%= res.getReservationNumber() %></strong></td>
-                                    <td><%= resGuest != null ? resGuest.getName() : "N/A" %></td>
-                                    <td><%= resGuest != null ? resGuest.getContactNumber() : "N/A" %></td>
-                                    <td><%= res.getRoomType() %></td>
-                                    <td><%= res.getCheckInDate() %></td>
-                                    <td><%= res.getCheckOutDate() %></td>
-                                    <td>
-                                        <span style="background: #c3e6cb; color: #155724; padding: 5px 10px; border-radius: 3px; font-size: 12px;">
-                                            <%= res.getStatus() %>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="<%= request.getContextPath() %>/download-bill?reservationId=<%= res.getReservationId() %>" class="download-btn" title="Download Bill">📥 Bill</a>
-                                        <button type="button" class="edit-btn" onclick="openEditModal(<%= res.getReservationId() %>, <%= res.getGuestId() %>, '<%= res.getRoomType() %>', '<%= res.getCheckInDate() %>', '<%= res.getCheckOutDate() %>')" title="Edit Reservation">✏️ Edit</button>
-                                        <form method="post" action="<%= request.getContextPath() %>/staff-dashboard" style="display: inline;">
-                                            <input type="hidden" name="action" value="delete-reservation">
-                                            <input type="hidden" name="reservationId" value="<%= res.getReservationId() %>">
-                                            <button type="submit" class="delete-btn" onclick="return confirm('Are you sure?');">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
                 </div>
-            <% } %>
-        </div>
 
-        <!-- Tab 4: Help & Instructions -->
-        <div id="help-tab" class="tab-content">
-            <h2 style="color: #333; margin-bottom: 10px;">📖 Help & Instructions</h2>
-            <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Welcome! This guide will help you efficiently manage guest reservations and navigate the Ocean View Resort staff dashboard.</p>
-
-            <!-- Managing Guests Section -->
-            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
-                <h3 style="color: #c49055; margin-bottom: 15px;">1️⃣ Managing Guests</h3>
-                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">Before creating reservations, you must add guests to the system:</p>
-                <ul style="color: #333; margin-left: 20px; line-height: 1.8;">
-                    <li><strong>Click "Manage Guests" tab</strong> to access the guest management section</li>
-                    <li><strong>Guest Name:</strong> Enter the full name (minimum 3 characters)</li>
-                    <li><strong>Contact Number:</strong> Phone number for communication with the guest</li>
-                    <li><strong>Address:</strong> Complete residential address (minimum 5 characters)</li>
-                    <li><strong>Click "✓ Add Guest"</strong> to save the new guest</li>
-                    <li><strong>Delete Guest:</strong> Use the Delete button to remove a guest (only if no active reservations)</li>
-                </ul>
-            </div>
-
-            <!-- Making Reservations Section -->
-            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
-                <h3 style="color: #c49055; margin-bottom: 15px;">2️⃣ Making Reservations</h3>
-                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">Step-by-step guide to creating a new reservation:</p>
-                <ol style="color: #333; margin-left: 20px; line-height: 1.9;">
-                    <li><strong>Go to "Manage Reservations" tab</strong></li>
-                    <li><strong>Select Guest:</strong> Choose from the dropdown list. Add guests first if the list is empty</li>
-                    <li><strong>Choose Room Type:</strong> Select from Single, Double, Deluxe, Suite, or Presidential</li>
-                    <li><strong>Select Check-In Date:</strong> Must be today or a future date (past dates not allowed)</li>
-                    <li><strong>Select Check-Out Date:</strong> Must be after check-in date (minimum 1 night stay)</li>
-                    <li><strong>Pick a Room:</strong> The system shows available rooms based on your selections. Price per night is displayed</li>
-                    <li><strong>Click "✓ Add Reservation"</strong> to confirm and create the reservation</li>
-                </ol>
-                <p style="color: #c49055; margin-top: 15px; font-size: 13px;"><strong>💡 Tip:</strong> The room list automatically updates when you change dates or room type, showing only available rooms for your chosen period.</p>
-            </div>
-
-            <!-- Viewing Reservations Section -->
-            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
-                <h3 style="color: #c49055; margin-bottom: 15px;">3️⃣ Viewing & Managing Reservations</h3>
-                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">The "View All Reservations" tab shows all bookings:</p>
-                <ul style="color: #333; margin-left: 20px; line-height: 1.8;">
-                    <li><strong>Reservation Number:</strong> Unique identifier for each booking (format: RES-XXXX)</li>
-                    <li><strong>Guest Details:</strong> Name and contact number from the guest table</li>
-                    <li><strong>Room Information:</strong> Room type and check-in/check-out dates</li>
-                    <li><strong>Status:</strong> Current booking status (Active, Completed, Cancelled)</li>
-                    <li><strong>📥 Bill:</strong> Click to download PDF bill with pricing breakdown and guest details</li>
-                    <li><strong>✏️ Edit:</strong> Modify room, dates, or other details (opens modal window)</li>
-                    <li><strong>Delete:</strong> Cancel the reservation completely</li>
-                </ul>
-            </div>
-
-            <!-- Important Notes Section -->
-            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
-                <h3 style="color: #c49055; margin-bottom: 15px;">4️⃣ Important Notes & Rules</h3>
-                <ul style="color: #333; margin-left: 20px; line-height: 1.9;">
-                    <li><strong>Room Availability:</strong> Once a room is booked for dates, it won't appear in the available list for overlapping dates</li>
-                    <li><strong>Minimum Stay:</strong> Reservations must be for at least 1 night; check-out must be after check-in</li>
-                    <li><strong>Currency:</strong> All prices are displayed in LKR (Sri Lankan Rupee)</li>
-                    <li><strong>Reservation Number:</strong> Unique for each booking; provide to guests for reference</li>
-                    <li><strong>Room Status:</strong> Updated automatically based on reservation dates (Available, Booked, Maintenance)</li>
-                    <li><strong>Guest Information:</strong> Always verify guest contact details before confirming reservations</li>
-                    <li><strong>Date Changes:</strong> When editing dates, ensure new dates don't conflict with other bookings</li>
-                </ul>
-            </div>
-
-            <!-- Bill Generation Section -->
-            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
-                <h3 style="color: #c49055; margin-bottom: 15px;">5️⃣ Bill Generation</h3>
-                <p style="color: #333; margin-bottom: 12px; font-weight: 500;">Generate and download guest bills:</p>
-                <ul style="color: #333; margin-left: 20px; line-height: 1.8;">
-                    <li><strong>Click "📥 Bill" button</strong> in the actions column of any reservation</li>
-                    <li><strong>PDF Download:</strong> A formatted bill is automatically downloaded to your computer</li>
-                    <li><strong>Bill Contents:</strong> Guest info, room details, check-in/check-out dates, total nights, daily rate, and total charge</li>
-                    <li><strong>Calculation:</strong> Total = Price per Night × Number of Nights</li>
-                    <li><strong>Sharing:</strong> Print or email the bill to guests for reference and payment</li>
-                </ul>
-            </div>
-
-            <!-- Troubleshooting Section -->
-            <div style="margin-bottom: 30px; padding: 20px; background: #f5ede0; border-left: 4px solid #d4a574; border-radius: 5px;">
-                <h3 style="color: #c49055; margin-bottom: 15px;">❌ Troubleshooting Common Issues</h3>
-                <div style="margin-bottom: 15px;">
-                    <strong style="color: #333;">Problem: "No rooms available" message</strong>
-                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Try selecting different check-in/check-out dates<br/>✓ Check if all rooms of that type are already booked for those dates<br/>✓ Try a different room type</p>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <strong style="color: #333;">Problem: "Guest not found" in dropdown</strong>
-                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Add the guest first in the "Manage Guests" tab<br/>✓ Ensure the guest name is spelled correctly</p>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <strong style="color: #333;">Problem: Can't select dates in the past</strong>
-                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Check-in date must be today or later (system blocks past dates)<br/>✓ Check-out date must be after check-in date</p>
-                </div>
-                <div>
-                    <strong style="color: #333;">Problem: Edit modal won't open</strong>
-                    <p style="color: #666; margin-left: 20px; margin-top: 8px;">✓ Ensure JavaScript is enabled in your browser<br/>✓ Try refreshing the page<br/>✓ Check browser console (F12) for errors</p>
-                </div>
-            </div>
-
-            <!-- Helpful Tips Section -->
-            <div style="padding: 20px; background: #e8dcc8; border-left: 4px solid #c49055; border-radius: 5px; margin-bottom: 20px;">
-                <h3 style="color: #c49055; margin-bottom: 12px;">💡 Best Practices & Helpful Tips</h3>
-                <ul style="color: #333; margin-left: 20px; line-height: 1.9;">
-                    <li><strong>Always verify guest information</strong> – Double-check spelling and contact numbers before confirmation</li>
-                    <li><strong>Confirm dates with guests</strong> – Even small date mistakes can cause booking conflicts</li>
-                    <li><strong>Note the Reservation Number</strong> – Give it to guests so they can reference their booking</li>
-                    <li><strong>Keep guest records updated</strong> – Update address or contact info if guest provides new details</li>
-                    <li><strong>Check room status regularly</strong> – Be aware of maintenance windows before confirming rooms</li>
-                    <li><strong>Use Edit wisely</strong> – Re-verify availability before changing reservation dates</li>
-                    <li><strong>Download bills promptly</strong> – Generate and send bills to guests after confirmation</li>
-                </ul>
-            </div>
-
-            <!-- Contact Help Section -->
-            <div style="padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724;">
-                <strong>Need more help?</strong> Contact the management team or refer to the hotel operations manual for detailed policies.
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Room data array
-    const roomsData = [
-        <% for (Room room : rooms) { %>
-            {
-                roomId: <%= room.getRoomId() %>,
-                roomNumber: '<%= room.getRoomNumber() %>',
-                roomType: '<%= room.getRoomType() %>',
-                status: '<%= room.getStatus() %>',
-                pricePerNight: <%= room.getPricePerNight() %>
-            },
-        <% } %>
-    ];
-
-    function updateRoomList() {
-        const roomTypeSelect = document.getElementById('roomType');
-        const checkInInput = document.getElementById('checkInDate');
-        const checkOutInput = document.getElementById('checkOutDate');
-        const roomIdSelect = document.getElementById('roomId');
-        const priceDisplay = document.getElementById('priceDisplay');
-
-        const selectedRoomType = roomTypeSelect.value;
-        const checkInDate = checkInInput.value;
-        const checkOutDate = checkOutInput.value;
-
-        if (!selectedRoomType || !checkInDate || !checkOutDate) {
-            roomIdSelect.innerHTML = '<option value="">-- Select a Room --</option>';
-            priceDisplay.innerHTML = '';
-            priceDisplay.style.display = 'none';
-            return;
-        }
-
-        // Fetch available rooms from server based on dates
-        const params = new URLSearchParams();
-        params.append('action', 'get-available-rooms');
-        params.append('roomType', selectedRoomType);
-        params.append('checkInDate', checkInDate);
-        params.append('checkOutDate', checkOutDate);
-
-        fetch('<%= request.getContextPath() %>/staff-dashboard?' + params.toString())
-            .then(response => response.json())
-            .then(availableRooms => {
-                
-                if (availableRooms.length === 0) {
-                    roomIdSelect.innerHTML = '<option value="">No rooms available for selected dates</option>';
-                    priceDisplay.innerHTML = '';
-                    priceDisplay.style.display = 'none';
-                    return;
-                }
-
-                // Create options for available rooms
-                roomIdSelect.innerHTML = '<option value="">-- Select a Room --</option>';
-                availableRooms.forEach(room => {
-                    const option = document.createElement('option');
-                    option.value = room.roomId;
-                    option.textContent = 'Room ' + room.roomNumber + ' - LKR ' + room.pricePerNight + '/night (' + room.status + ')';
-                    option.setAttribute('data-price', room.pricePerNight);
-                    roomIdSelect.appendChild(option);
-                });
-
-                // Show price for first available room
-                if (availableRooms.length > 0) {
-                    const firstRoom = availableRooms[0];
-                    priceDisplay.innerHTML = '💰 Price: LKR ' + firstRoom.pricePerNight + '/night';
-                    priceDisplay.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching available rooms:', error);
-                roomIdSelect.innerHTML = '<option value="">Error loading rooms</option>';
-            });
-    }
-
-    function updatePrice() {
-        const roomIdSelect = document.getElementById('roomId');
-        const priceDisplay = document.getElementById('priceDisplay');
-        
-        if (roomIdSelect.value) {
-            const selectedOption = roomIdSelect.options[roomIdSelect.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-            if (priceDisplay && price) {
-                const priceHTML = '💰 Price: LKR ' + price + '/night';
-                priceDisplay.innerHTML = priceHTML;
-                priceDisplay.style.display = 'block';
-            }
-        } else {
-            // Hide price display when no room selected
-            if (priceDisplay) {
-                priceDisplay.innerHTML = '';
-                priceDisplay.style.display = 'none';
-            }
-        }
-    }
-
-    function switchTab(event, tabName) {
-        // Hide all tab contents
-        const contents = document.querySelectorAll('.tab-content');
-        contents.forEach(content => content.classList.remove('active'));
-
-        // Remove active class from all buttons
-        const buttons = document.querySelectorAll('.tab-button');
-        buttons.forEach(button => button.classList.remove('active'));
-
-        // Show the selected tab
-        document.getElementById(tabName).classList.add('active');
-        event.target.classList.add('active');
-    }
-
-    // Initialize room list on page load with default dates
-    document.addEventListener('DOMContentLoaded', function() {
-        const checkInInput = document.getElementById('checkInDate');
-        const checkOutInput = document.getElementById('checkOutDate');
-        const roomTypeSelect = document.getElementById('roomType');
-        
-        // If dates are already set (from earlier initialization), trigger room list update
-        if (checkInInput && checkOutInput && roomTypeSelect && checkInInput.value && checkOutInput.value && roomTypeSelect.value) {
-            setTimeout(function() {
-                updateRoomList();
-            }, 100);
-        }
-    });
-
-    // Set minimum date to today for check-in
-    const checkInInput = document.getElementById('checkInDate');
-    if (checkInInput) {
-        const today = new Date().toISOString().split('T')[0];
-        checkInInput.min = today;
-        
-        // Set check-in to today initially
-        checkInInput.value = today;
-        
-        // Auto-set checkout to tomorrow
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('checkOutDate').value = tomorrow.toISOString().split('T')[0];
-        
-        // Trigger initial room list load
-        setTimeout(function() {
-            updateRoomList();
-        }, 50);
-        
-        // Update check-out date when check-in changes
-        checkInInput.addEventListener('change', function() {
-            const checkOutInput = document.getElementById('checkOutDate');
-            // Set checkout to one day after checkin
-            const nextDay = new Date(this.value);
-            nextDay.setDate(nextDay.getDate() + 1);
-            checkOutInput.value = nextDay.toISOString().split('T')[0];
-            checkOutInput.min = this.value;
-            updateRoomList();
-        });
-    }
-
-    // Update room list when check-out date changes
-    const checkOutInput = document.getElementById('checkOutDate');
-    if (checkOutInput) {
-        checkOutInput.addEventListener('change', updateRoomList);
-    }
-
-    // Update room list when room type changes
-    const roomTypeSelect = document.getElementById('roomType');
-    if (roomTypeSelect) {
-        roomTypeSelect.addEventListener('change', updateRoomList);
-    }
-
-    // Update price when room is selected
-    const roomIdSelect = document.getElementById('roomId');
-    if (roomIdSelect) {
-        roomIdSelect.addEventListener('change', updatePrice);
-    }
-
-    // Edit Modal Functions
-    function openEditModal(reservationId, guestId, roomType, checkIn, checkOut) {
-        const modal = document.getElementById('editModal');
-        document.getElementById('editReservationId').value = reservationId;
-        document.getElementById('editGuestId').value = guestId;
-        document.getElementById('editRoomType').value = roomType;
-        document.getElementById('editCheckInDate').value = checkIn;
-        document.getElementById('editCheckOutDate').value = checkOut;
-        
-        // Reset room selection and price display
-        document.getElementById('editRoomId').innerHTML = '<option value="">-- Select a Room --</option>';
-        document.getElementById('editPriceDisplay').innerHTML = '';
-        document.getElementById('editPriceDisplay').style.display = 'none';
-        
-        // Load rooms for the selected room type (passing reservationId to exclude from conflicts)
-        updateEditRoomList(reservationId);
-        
-        modal.style.display = 'block';
-    }
-
-    function closeEditModal() {
-        const modal = document.getElementById('editModal');
-        modal.style.display = 'none';
-    }
-
-    // Guest Edit Modal Functions
-    function openEditGuestModal(guestId, guestName, contactNumber, address) {
-        const modal = document.getElementById('editGuestModal');
-        document.getElementById('editGuestIdField').value = guestId;
-        document.getElementById('editGuestNameField').value = guestName;
-        document.getElementById('editContactNumberField').value = contactNumber;
-        document.getElementById('editAddressField').value = address;
-        modal.style.display = 'block';
-    }
-
-    function closeEditGuestModal() {
-        const modal = document.getElementById('editGuestModal');
-        modal.style.display = 'none';
-    }
-
-    function updateEditRoomList(excludeReservationId) {
-        // If not provided as parameter, get it from the hidden form field
-        if (!excludeReservationId) {
-            excludeReservationId = document.getElementById('editReservationId').value;
-        }
-
-        const roomTypeSelect = document.getElementById('editRoomType');
-        const checkInInput = document.getElementById('editCheckInDate');
-        const checkOutInput = document.getElementById('editCheckOutDate');
-        const roomIdSelect = document.getElementById('editRoomId');
-        const priceDisplay = document.getElementById('editPriceDisplay');
-
-        const selectedRoomType = roomTypeSelect.value;
-        const checkInDate = checkInInput.value;
-        const checkOutDate = checkOutInput.value;
-
-        if (!selectedRoomType || !checkInDate || !checkOutDate) {
-            roomIdSelect.innerHTML = '<option value="">-- Select a Room --</option>';
-            priceDisplay.innerHTML = '';
-            priceDisplay.style.display = 'none';
-            return;
-        }
-
-        // Fetch available rooms from server, excluding current reservation from conflict check
-        const params = new URLSearchParams();
-        params.append('action', 'get-available-rooms');
-        params.append('roomType', selectedRoomType);
-        params.append('checkInDate', checkInDate);
-        params.append('checkOutDate', checkOutDate);
-        if (excludeReservationId) {
-            params.append('excludeReservationId', excludeReservationId);
-        }
-
-        fetch('<%= request.getContextPath() %>/staff-dashboard?' + params.toString())
-            .then(response => response.json())
-            .then(availableRooms => {
-                if (availableRooms.length === 0) {
-                    roomIdSelect.innerHTML = '<option value="">No rooms available for selected dates</option>';
-                    priceDisplay.innerHTML = '';
-                    priceDisplay.style.display = 'none';
-                    return;
-                }
-
-                // Create options for available rooms
-                roomIdSelect.innerHTML = '<option value="">-- Select a Room --</option>';
-                availableRooms.forEach(room => {
-                    const option = document.createElement('option');
-                    option.value = room.roomId;
-                    option.textContent = 'Room ' + room.roomNumber + ' - LKR ' + room.pricePerNight + '/night (' + room.status + ')';
-                    option.setAttribute('data-price', room.pricePerNight);
-                    roomIdSelect.appendChild(option);
-                });
-
-                // Show price for first available room
-                if (availableRooms.length > 0) {
-                    const firstRoom = availableRooms[0];
-                    priceDisplay.innerHTML = '💰 Price: LKR ' + firstRoom.pricePerNight + '/night';
-                    priceDisplay.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching available rooms:', error);
-                roomIdSelect.innerHTML = '<option value="">Error loading rooms</option>';
-            });
-    }
-
-    function updateEditPrice() {
-        const roomIdSelect = document.getElementById('editRoomId');
-        const checkInInput = document.getElementById('editCheckInDate');
-        const checkOutInput = document.getElementById('editCheckOutDate');
-        const priceDisplay = document.getElementById('editPriceDisplay');
-        const selectedOption = roomIdSelect.options[roomIdSelect.selectedIndex];
-
-        if (!selectedOption.value) {
-            priceDisplay.innerHTML = '';
-            priceDisplay.style.display = 'none';
-            return;
-        }
-
-        const pricePerNight = selectedOption.getAttribute('data-price');
-        const checkIn = new Date(checkInInput.value);
-        const checkOut = new Date(checkOutInput.value);
-        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-
-        if (nights > 0 && pricePerNight) {
-            const totalPrice = (nights * parseFloat(pricePerNight)).toFixed(2);
-            priceDisplay.innerHTML = '💰 Price: LKR ' + pricePerNight + '/night × ' + nights + ' nights = <strong>LKR ' + totalPrice + '</strong>';
-            priceDisplay.style.display = 'block';
-        } else {
-            priceDisplay.innerHTML = '';
-            priceDisplay.style.display = 'none';
-        }
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const editModal = document.getElementById('editModal');
-        if (event.target === editModal) {
-            editModal.style.display = 'none';
-        }
-    };
-
-    // Add event listeners to edit modal inputs
-    document.addEventListener('DOMContentLoaded', function() {
-        const editCheckInInput = document.getElementById('editCheckInDate');
-        if (editCheckInInput) {
-            editCheckInInput.addEventListener('change', function() {
-                const editCheckOutInput = document.getElementById('editCheckOutDate');
-                const nextDay = new Date(this.value);
-                nextDay.setDate(nextDay.getDate() + 1);
-                editCheckOutInput.value = nextDay.toISOString().split('T')[0];
-                editCheckOutInput.min = this.value;
-                updateEditRoomList();
-            });
-        }
-
-        const editCheckOutInput = document.getElementById('editCheckOutDate');
-        if (editCheckOutInput) {
-            editCheckOutInput.addEventListener('change', function() {
-                updateEditRoomList();
-            });
-        }
-
-        const editRoomTypeSelect = document.getElementById('editRoomType');
-        if (editRoomTypeSelect) {
-            editRoomTypeSelect.addEventListener('change', function() {
-                updateEditRoomList();
-            });
-        }
-
-        const editRoomIdSelect = document.getElementById('editRoomId');
-        if (editRoomIdSelect) {
-            editRoomIdSelect.addEventListener('change', updateEditPrice);
-        }
-    });
-</script>
-
-<!-- Edit Reservation Modal -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Edit Reservation</h2>
-            <button class="modal-close" onclick="closeEditModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <form method="post" action="<%= request.getContextPath() %>/staff-dashboard" id="editForm">
-                <input type="hidden" name="action" value="edit-reservation">
-                <input type="hidden" id="editReservationId" name="reservationId">
-                <input type="hidden" id="editGuestId" name="guestId">
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editRoomType">Room Type:</label>
-                        <select id="editRoomType" name="roomType" required>
-                            <option value="">-- Select Room Type --</option>
-                            <option value="Single">Single</option>
-                            <option value="Double">Double</option>
-                            <option value="Deluxe">Deluxe</option>
-                            <option value="Suite">Suite</option>
-                            <option value="Presidential">Presidential</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRoomId">Room (LKR):</label>
-                        <select id="editRoomId" name="roomId" required>
-                            <option value="">-- Select a Room --</option>
-                        </select>
+                <!-- Edit Guest Modal -->
+                <div id="editGuestModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Edit Guest</h2>
+                            <button class="modal-close" onclick="closeEditGuestModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="<%= ctx %>/staff-dashboard" id="editGuestForm">
+                                <input type="hidden" name="action" value="edit-guest">
+                                <input type="hidden" id="editGuestIdField" name="guestId">
+                                <div class="form-group">
+                                    <label for="editGuestNameField">Guest Name:</label>
+                                    <input type="text" id="editGuestNameField" name="guestName" required minlength="3">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editContactNumberField">Contact Number:</label>
+                                        <input type="tel" id="editContactNumberField" name="contactNumber" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editAddressField">Address:</label>
+                                        <input type="text" id="editAddressField" name="address" required minlength="5">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editEmailField">Email Address:</label>
+                                    <input type="email" id="editEmailField" name="email"
+                                        placeholder="guest@example.com">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="cancel-btn" onclick="closeEditGuestModal()">Cancel</button>
+                            <button type="submit" form="editGuestForm" class="submit-btn">Save Changes</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editCheckInDate">Check-In Date:</label>
-                        <input type="date" id="editCheckInDate" name="checkInDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editCheckOutDate">Check-Out Date:</label>
-                        <input type="date" id="editCheckOutDate" name="checkOutDate" required>
-                    </div>
-                </div>
+                <script>
+                    var CTX = '<%= ctx %>';
+                    var currentEditRoomId = null;
 
-                <div id="editPriceDisplay" style="padding: 15px; background: #f5ede0; border-radius: 5px; margin: 20px 0; border-left: 4px solid #c49055; display: none;"></div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
-            <button type="submit" form="editForm" class="submit-btn">Save Changes</button>
-        </div>
-    </div>
-</div>
+                    function escHtml(s) {
+                        return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    }
 
-<!-- Edit Guest Modal -->
-<div id="editGuestModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Edit Guest</h2>
-            <button class="modal-close" onclick="closeEditGuestModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <form method="post" action="<%= request.getContextPath() %>/staff-dashboard" id="editGuestForm">
-                <input type="hidden" name="action" value="edit-guest">
-                <input type="hidden" id="editGuestIdField" name="guestId">
+                    function switchTab(ev, tabName) {
+                        document.querySelectorAll('.tab-content').forEach(function (c) { c.classList.remove('active'); });
+                        document.querySelectorAll('.tab-button').forEach(function (b) { b.classList.remove('active'); });
+                        document.getElementById(tabName).classList.add('active');
+                        ev.target.classList.add('active');
+                    }
 
-                <div class="form-group">
-                    <label for="editGuestNameField">Guest Name:</label>
-                    <input type="text" id="editGuestNameField" name="guestName" required minlength="3">
-                </div>
+                    // ─── Guests ───────────────────────────────────────────────────────────
+                    function loadGuests() {
+                        fetch(CTX + '/api/guests')
+                            .then(function (r) { return r.json(); })
+                            .then(function (guests) {
+                                renderGuestsTable(guests);
+                                renderGuestDropdown(guests);
+                            })
+                            .catch(function (err) {
+                                console.error('Failed to load guests:', err);
+                                document.getElementById('guestsTableBody').innerHTML =
+                                    '<tr><td colspan="7" style="text-align:center;color:red;">Failed to load guests.</td></tr>';
+                            });
+                    }
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editContactNumberField">Contact Number:</label>
-                        <input type="tel" id="editContactNumberField" name="contactNumber" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editAddressField">Address:</label>
-                        <input type="text" id="editAddressField" name="address" required minlength="5">
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="cancel-btn" onclick="closeEditGuestModal()">Cancel</button>
-            <button type="submit" form="editGuestForm" class="submit-btn">Save Changes</button>
-        </div>
-    </div>
-</div>
+                    function renderGuestsTable(guests) {
+                        var tbody = document.getElementById('guestsTableBody');
+                        if (!guests || guests.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No guests found. Start adding guests!</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        for (var i = 0; i < guests.length; i++) {
+                            var g = guests[i];
+                            var ts = g.createdAt ? g.createdAt.replace('T', ' ').substring(0, 19) : '';
+                            var email = g.email || '';
+                            html += '<tr>' +
+                                '<td><strong>' + g.guestId + '</strong></td>' +
+                                '<td>' + g.name + '</td>' +
+                                '<td>' + g.contactNumber + '</td>' +
+                                '<td>' + (email ? '<a href="mailto:' + email + '">' + email + '</a>' : '<span style="color:#bbb;">—</span>') + '</td>' +
+                                '<td>' + g.address + '</td>' +
+                                '<td>' + ts + '</td>' +
+                                '<td><div class="action-btns">' +
+                                '<button type="button" class="edit-btn" onclick="openEditGuestModal(' + g.guestId + ',\'' + escHtml(g.name) + '\',\'' + escHtml(g.contactNumber) + '\',\'' + escHtml(g.address) + '\',\'' + escHtml(email) + '\')">&#9999;&#65039; Edit</button>' +
+                                '<form method="post" action="' + CTX + '/staff-dashboard" style="display:inline;">' +
+                                '<input type="hidden" name="action" value="delete-guest">' +
+                                '<input type="hidden" name="guestId" value="' + g.guestId + '">' +
+                                '<button type="submit" class="delete-btn" onclick="return confirm(\'Are you sure?\');">Delete</button>' +
+                                '</form></div></td></tr>';
+                        }
+                        tbody.innerHTML = html;
+                    }
 
-</body>
-</html>
+                    function renderGuestDropdown(guests) {
+                        var sel = document.getElementById('guestId');
+                        if (!sel) return;
+                        var prev = sel.value;
+                        sel.innerHTML = '<option value="">-- Select a Guest --</option>';
+                        if (!guests || guests.length === 0) {
+                            sel.innerHTML = '<option value="">No guests available - add one first</option>';
+                            return;
+                        }
+                        for (var i = 0; i < guests.length; i++) {
+                            var g = guests[i];
+                            var opt = document.createElement('option');
+                            opt.value = g.guestId;
+                            opt.textContent = g.name + ' (' + g.contactNumber + ')';
+                            if (String(g.guestId) === prev) opt.selected = true;
+                            sel.appendChild(opt);
+                        }
+                    }
+
+                    // ─── Reservations ─────────────────────────────────────────────────────
+                    var guestMap = {};
+
+                    function loadReservations() {
+                        Promise.all([
+                            fetch(CTX + '/api/reservations').then(function (r) { return r.json(); }),
+                            fetch(CTX + '/api/guests').then(function (r) { return r.json(); })
+                        ]).then(function (results) {
+                            var reservations = results[0];
+                            var guests = results[1];
+                            guestMap = {};
+                            for (var i = 0; i < guests.length; i++) { guestMap[guests[i].guestId] = guests[i]; }
+                            renderReservationsTable(reservations);
+                        }).catch(function (err) {
+                            console.error('Failed to load reservations:', err);
+                            document.getElementById('reservationsTableBody').innerHTML =
+                                '<tr><td colspan="8" style="text-align:center;color:red;">Failed to load reservations.</td></tr>';
+                        });
+                    }
+
+                    function renderReservationsTable(reservations) {
+                        var tbody = document.getElementById('reservationsTableBody');
+                        if (!reservations || reservations.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="9" class="empty-message">No reservations found.</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        for (var i = 0; i < reservations.length; i++) {
+                            var res = reservations[i];
+                            var g = guestMap[res.guestId];
+                            var gName = g ? g.name : 'N/A';
+                            var gContact = g ? g.contactNumber : 'N/A';
+                            var gEmail = g && g.email ? g.email : '';
+                            html += '<tr>' +
+                                '<td><strong>' + res.reservationNumber + '</strong></td>' +
+                                '<td>' + gName + '</td>' +
+                                '<td>' + gContact + '</td>' +
+                                '<td>' + (gEmail ? '<a href="mailto:' + gEmail + '">' + gEmail + '</a>' : '<span style="color:#bbb;">—</span>') + '</td>' +
+                                '<td>' + res.roomType + '</td>' +
+                                '<td>' + res.checkInDate + '</td>' +
+                                '<td>' + res.checkOutDate + '</td>' +
+                                '<td><span style="background:#c3e6cb;color:#155724;padding:5px 10px;border-radius:3px;font-size:12px;">' + res.status + '</span></td>' +
+                                '<td>' +
+                                '<a href="' + CTX + '/download-bill?reservationId=' + res.reservationId + '" class="download-btn">&#128229; Bill</a>' +
+                                '<button type="button" class="edit-btn" onclick="openEditModal(' + res.reservationId + ',' + res.guestId + ',\'' + escHtml(res.roomType) + '\',\'' + res.checkInDate + '\',\'' + res.checkOutDate + '\',' + res.roomId + ')">&#9999;&#65039; Edit</button>' +
+                                '<form method="post" action="' + CTX + '/staff-dashboard" style="display:inline;">' +
+                                '<input type="hidden" name="action" value="delete-reservation">' +
+                                '<input type="hidden" name="reservationId" value="' + res.reservationId + '">' +
+                                '<button type="submit" class="delete-btn" onclick="return confirm(\'Are you sure?\');">Delete</button>' +
+                                '</form></td></tr>';
+                        }
+                        tbody.innerHTML = html;
+                    }
+
+                    // ─── Available Rooms AJAX ─────────────────────────────────────────────
+                    function updateRoomList() {
+                        var roomType = document.getElementById('roomType').value;
+                        var checkIn = document.getElementById('checkInDate').value;
+                        var checkOut = document.getElementById('checkOutDate').value;
+                        var roomSel = document.getElementById('roomId');
+                        var priceDisp = document.getElementById('priceDisplay');
+
+                        if (!roomType || !checkIn || !checkOut) {
+                            roomSel.innerHTML = '<option value="">-- Select a Room --</option>';
+                            priceDisp.innerHTML = ''; priceDisp.style.display = 'none';
+                            return;
+                        }
+
+                        fetch(CTX + '/api/rooms?action=available&roomType=' + encodeURIComponent(roomType) +
+                            '&checkInDate=' + checkIn + '&checkOutDate=' + checkOut)
+                            .then(function (r) { return r.json(); })
+                            .then(function (rooms) {
+                                if (rooms.length === 0) {
+                                    roomSel.innerHTML = '<option value="">No rooms available for selected dates</option>';
+                                    priceDisp.innerHTML = ''; priceDisp.style.display = 'none';
+                                    return;
+                                }
+                                roomSel.innerHTML = '<option value="">-- Select a Room --</option>';
+                                for (var i = 0; i < rooms.length; i++) {
+                                    var opt = document.createElement('option');
+                                    opt.value = rooms[i].roomId;
+                                    opt.textContent = 'Room ' + rooms[i].roomNumber + ' - LKR ' + rooms[i].pricePerNight + '/night';
+                                    opt.setAttribute('data-price', rooms[i].pricePerNight);
+                                    roomSel.appendChild(opt);
+                                }
+                                priceDisp.innerHTML = '&#128176; Price: LKR ' + rooms[0].pricePerNight + '/night';
+                                priceDisp.style.display = 'block';
+                            })
+                            .catch(function (err) {
+                                console.error('Error fetching rooms:', err);
+                                roomSel.innerHTML = '<option value="">Error loading rooms</option>';
+                            });
+                    }
+
+                    function updatePrice() {
+                        var sel = document.getElementById('roomId');
+                        var pd = document.getElementById('priceDisplay');
+                        if (sel.value) {
+                            var p = sel.options[sel.selectedIndex].getAttribute('data-price');
+                            pd.innerHTML = '&#128176; Price: LKR ' + p + '/night';
+                            pd.style.display = 'block';
+                        } else { pd.innerHTML = ''; pd.style.display = 'none'; }
+                    }
+
+                    // ─── Edit Reservation Modal ───────────────────────────────────────────
+                    function openEditModal(resId, guestId, roomType, checkIn, checkOut, roomId) {
+                        document.getElementById('editReservationId').value = resId;
+                        document.getElementById('editGuestId').value = guestId;
+                        document.getElementById('editRoomType').value = roomType;
+                        document.getElementById('editCheckInDate').value = checkIn;
+                        document.getElementById('editCheckOutDate').value = checkOut;
+                        document.getElementById('editRoomId').innerHTML = '<option value="">-- Select a Room --</option>';
+                        document.getElementById('editPriceDisplay').innerHTML = '';
+                        document.getElementById('editPriceDisplay').style.display = 'none';
+                        currentEditRoomId = roomId;
+                        updateEditRoomList(resId);
+                        document.getElementById('editModal').style.display = 'block';
+                    }
+
+                    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+                    function updateEditRoomList(excludeId) {
+                        if (excludeId && typeof excludeId !== 'number' && typeof excludeId !== 'string') {
+                            excludeId = null;
+                        }
+                        if (!excludeId) excludeId = document.getElementById('editReservationId').value;
+
+                        var roomType = document.getElementById('editRoomType').value;
+                        var checkIn = document.getElementById('editCheckInDate').value;
+                        var checkOut = document.getElementById('editCheckOutDate').value;
+                        var roomSel = document.getElementById('editRoomId');
+                        var priceDisp = document.getElementById('editPriceDisplay');
+
+                        if (!roomType || !checkIn || !checkOut) {
+                            roomSel.innerHTML = '<option value="">-- Select a Room --</option>';
+                            priceDisp.innerHTML = ''; priceDisp.style.display = 'none';
+                            return;
+                        }
+
+                        fetch(CTX + '/api/rooms?action=available&roomType=' + encodeURIComponent(roomType) +
+                            '&checkInDate=' + checkIn + '&checkOutDate=' + checkOut +
+                            (excludeId ? '&excludeReservationId=' + excludeId : ''))
+                            .then(function (r) { return r.json(); })
+                            .then(function (rooms) {
+                                if (rooms.length === 0) {
+                                    roomSel.innerHTML = '<option value="">No rooms available</option>';
+                                    priceDisp.innerHTML = ''; priceDisp.style.display = 'none';
+                                    return;
+                                }
+                                roomSel.innerHTML = '<option value="">-- Select a Room --</option>';
+                                for (var i = 0; i < rooms.length; i++) {
+                                    var opt = document.createElement('option');
+                                    opt.value = rooms[i].roomId;
+                                    opt.textContent = 'Room ' + rooms[i].roomNumber + ' - LKR ' + rooms[i].pricePerNight + '/night';
+                                    opt.setAttribute('data-price', rooms[i].pricePerNight);
+                                    if (currentEditRoomId && String(rooms[i].roomId) === String(currentEditRoomId)) {
+                                        opt.selected = true;
+                                    }
+                                    roomSel.appendChild(opt);
+                                }
+                                updateEditPrice();
+                            })
+                            .catch(function (err) { console.error(err); roomSel.innerHTML = '<option value="">Error loading rooms</option>'; });
+                    }
+
+                    function updateEditPrice() {
+                        var sel = document.getElementById('editRoomId');
+                        var pd = document.getElementById('editPriceDisplay');
+                        var ci = document.getElementById('editCheckInDate').value;
+                        var co = document.getElementById('editCheckOutDate').value;
+                        if (!sel.value) { pd.innerHTML = ''; pd.style.display = 'none'; return; }
+                        var price = sel.options[sel.selectedIndex].getAttribute('data-price');
+                        var nights = Math.ceil((new Date(co) - new Date(ci)) / 86400000);
+                        if (nights > 0 && price) {
+                            pd.innerHTML = '&#128176; LKR ' + price + '/night x ' + nights + ' nights = <strong>LKR ' + (nights * parseFloat(price)).toFixed(2) + '</strong>';
+                            pd.style.display = 'block';
+                        } else { pd.innerHTML = ''; pd.style.display = 'none'; }
+                    }
+
+                    // ─── Edit Guest Modal ─────────────────────────────────────────────────
+                    function openEditGuestModal(id, name, contact, address, email) {
+                        document.getElementById('editGuestIdField').value = id;
+                        document.getElementById('editGuestNameField').value = name;
+                        document.getElementById('editContactNumberField').value = contact;
+                        document.getElementById('editAddressField').value = address;
+                        document.getElementById('editEmailField').value = email || '';
+                        document.getElementById('editGuestModal').style.display = 'block';
+                    }
+
+                    function closeEditGuestModal() { document.getElementById('editGuestModal').style.display = 'none'; }
+
+                    window.onclick = function (e) {
+                        if (e.target === document.getElementById('editModal')) closeEditModal();
+                        if (e.target === document.getElementById('editGuestModal')) closeEditGuestModal();
+                    };
+
+                    // ─── Init ─────────────────────────────────────────────────────────────
+                    document.addEventListener('DOMContentLoaded', function () {
+                        loadGuests();
+                        loadReservations();
+
+                        var checkInInput = document.getElementById('checkInDate');
+                        if (checkInInput) {
+                            var today = new Date().toISOString().split('T')[0];
+                            checkInInput.min = today;
+                            checkInInput.value = today;
+
+                            var tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            var checkOutInput = document.getElementById('checkOutDate');
+                            var tomorrowStr = tomorrow.toISOString().split('T')[0];
+                            checkOutInput.value = tomorrowStr;
+                            checkOutInput.min = tomorrowStr;
+
+                            checkInInput.addEventListener('change', function () {
+                                var next = new Date(this.value);
+                                next.setDate(next.getDate() + 1);
+                                checkOutInput.value = next.toISOString().split('T')[0];
+                                checkOutInput.min = this.value;
+                                updateRoomList();
+                            });
+                            checkOutInput.addEventListener('change', updateRoomList);
+                            document.getElementById('roomType').addEventListener('change', updateRoomList);
+                            document.getElementById('roomId').addEventListener('change', updatePrice);
+
+                            setTimeout(updateRoomList, 50);
+                        }
+
+                        var editCheckIn = document.getElementById('editCheckInDate');
+                        if (editCheckIn) {
+                            var editCheckOut = document.getElementById('editCheckOutDate');
+                            editCheckOut.min = new Date().toISOString().split('T')[0];
+                            editCheckIn.addEventListener('change', function () {
+                                var next = new Date(this.value);
+                                next.setDate(next.getDate() + 1);
+                                editCheckOut.value = next.toISOString().split('T')[0];
+                                editCheckOut.min = this.value;
+                                updateEditRoomList();
+                            });
+                            document.getElementById('editCheckOutDate').addEventListener('change', updateEditRoomList);
+                            document.getElementById('editRoomType').addEventListener('change', updateEditRoomList);
+                            document.getElementById('editRoomId').addEventListener('change', updateEditPrice);
+                        }
+                    });
+                </script>
+            </body>
+
+            </html>
+            <%--@formatter:on--%>

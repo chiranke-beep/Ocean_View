@@ -92,6 +92,7 @@ public class BillServlet extends HttpServlet {
             bill.setReservationId(reservationId);
             bill.setGuestName(guest.getName());
             bill.setGuestContactNumber(guest.getContactNumber());
+            bill.setGuestEmail(guest.getEmail() != null ? guest.getEmail() : "");
             bill.setRoomType(reservation.getRoomType());
             bill.setRoomNumber(roomNumber);
             bill.setCheckInDate(reservation.getCheckInDate());
@@ -202,6 +203,14 @@ public class BillServlet extends HttpServlet {
         contentStream.newLineAtOffset(margin, yPosition);
         contentStream.showText("Contact: " + bill.getGuestContactNumber());
         contentStream.endText();
+
+        if (bill.getGuestEmail() != null && !bill.getGuestEmail().isEmpty()) {
+            yPosition -= 14;
+            contentStream.beginText();
+            contentStream.newLineAtOffset(margin, yPosition);
+            contentStream.showText("Email: " + bill.getGuestEmail());
+            contentStream.endText();
+        }
 
         // Reservation Details Section
         yPosition -= 25;

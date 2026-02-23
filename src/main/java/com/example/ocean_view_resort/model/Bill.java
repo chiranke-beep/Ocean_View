@@ -9,6 +9,7 @@ public class Bill {
     private int reservationId;
     private String guestName;
     private String guestContactNumber;
+    private String guestEmail;
     private String roomType;
     private String roomNumber;
     private LocalDate checkInDate;
@@ -69,6 +70,14 @@ public class Bill {
 
     public void setGuestContactNumber(String guestContactNumber) {
         this.guestContactNumber = guestContactNumber;
+    }
+
+    public String getGuestEmail() {
+        return guestEmail;
+    }
+
+    public void setGuestEmail(String guestEmail) {
+        this.guestEmail = guestEmail;
     }
 
     public String getRoomType() {

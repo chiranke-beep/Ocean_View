@@ -20,10 +20,9 @@ public class HelloServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.println("<html><body>");
         out.println("<h1>" + message + "</h1>");
-        
+
         // Test database connection
-        try {
-            Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
             if (conn != null && !conn.isClosed()) {
                 out.println("<p style='color: green;'><strong>Database Connection: OK</strong></p>");
             } else {
@@ -32,11 +31,11 @@ public class HelloServlet extends HttpServlet {
         } catch (Exception e) {
             out.println("<p style='color: red;'><strong>Database Connection Error: " + e.getMessage() + "</strong></p>");
         }
-        
+
         out.println("</body></html>");
     }
 
     public void destroy() {
-        DatabaseConnection.getInstance().closeConnection();
+        // No-op: each connection is now opened and closed independently per request.
     }
 }
