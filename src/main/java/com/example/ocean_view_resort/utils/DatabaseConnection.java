@@ -5,79 +5,48 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Singleton pattern for Database Connection
- * Provides a single instance of database connection throughout the application
+ * DatabaseConnection – singleton for driver loading and config.
+ *
+ * getConnection() returns a FRESH connection every time so that
+ * each DAO call/try-with-resources block gets its own independent
+ * connection. Sharing one connection across concurrent requests caused
+ * "ResultSet closed" errors because one thread's try-with-resources
+ * would close the singleton connection while another thread was still
+ * iterating its ResultSet.
  */
 public class DatabaseConnection {
+
     private static DatabaseConnection instance;
-    private Connection connection;
-    
+
     // Database configuration
-    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/ocean_view_resort";
-    private static final String DB_USER = "root";
+    private static final String DB_URL      = "jdbc:mysql://localhost:3306/ocean_view_resort"
+            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String DB_USER     = "root";
     private static final String DB_PASSWORD = "Chiran123$";
-    
-    /**
-     * Private constructor to prevent instantiation
-     */
+
     private DatabaseConnection() {
         try {
-            Class.forName(DB_DRIVER);
-            this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            System.out.println("Database connection established successfully!");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("MySQL driver loaded successfully.");
         } catch (ClassNotFoundException e) {
-            System.out.println("MySQL Driver not found: " + e.getMessage());
-            e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("Failed to establish database connection: " + e.getMessage());
+            System.err.println("MySQL Driver not found: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
-    /**
-     * Thread-safe method to get single instance of DatabaseConnection
-     * @return instance of DatabaseConnection
-     */
+
     public static synchronized DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();
         }
         return instance;
     }
-    
+
     /**
-     * Get the database connection
-     * @return Connection object
+     * Returns a new, independent database connection.
+     * Callers are responsible for closing it (use try-with-resources).
      */
-    public Connection getConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            }
-        } catch (SQLException e) {
-            System.out.println("Connection is closed, re-establishing: " + e.getMessage());
-            try {
-                this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return this.connection;
-    }
-    
-    /**
-     * Close the database connection
-     */
-    public void closeConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("Database connection closed successfully!");
-            }
-        } catch (SQLException e) {
-            System.out.println("Error closing connection: " + e.getMessage());
-            e.printStackTrace();
-        }
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 }
+
