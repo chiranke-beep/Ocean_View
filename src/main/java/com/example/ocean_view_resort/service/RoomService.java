@@ -20,5 +20,6 @@ public interface RoomService {
     BigDecimal getPriceByRoomType(String roomType); // Get first room price for a room type
     boolean addRoom(String roomNumber, String roomType, double pricePerNight, int capacity);
     boolean updateRoom(int roomId, String roomNumber, String roomType, double pricePerNight, int capacity, String status);
+    boolean editRoom(int roomId, String roomType, double pricePerNight, int capacity, String status);
     boolean deleteRoom(int roomId);
 }

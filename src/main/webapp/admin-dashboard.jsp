@@ -224,6 +224,56 @@
                             font-size: 12px;
                         }
 
+                        .edit-btn {
+                            padding: 8px 12px;
+                            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            font-weight: 600;
+                            transition: all 0.3s;
+                        }
+
+                        .edit-btn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                        }
+
+                        .cancel-btn {
+                            padding: 10px 20px;
+                            background: #e0e0e0;
+                            color: #333;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                            transition: all 0.3s;
+                        }
+
+                        .cancel-btn:hover {
+                            background: #d0d0d0;
+                        }
+
+                        .submit-btn {
+                            padding: 10px 20px;
+                            background: linear-gradient(135deg, #d4a574 0%, #c49055 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                            transition: all 0.3s;
+                        }
+
+                        .submit-btn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+                        }
+
                         /* Modal Styles */
                         .modal {
                             display: none;
@@ -580,11 +630,15 @@
                                             '<td>' + r.capacity + '</td>' +
                                             '<td><span style="background:#e8f5e9;padding:4px 8px;border-radius:4px;font-size:12px;">' + r.status + '</span></td>' +
                                             '<td>' +
+                                            '<div class="action-btns">' +
+                                            '<button type="button" class="edit-btn" onclick="openEditRoomModal(' + r.roomId + ', \'' + r.roomType + '\', ' + r.pricePerNight + ', ' + r.capacity + ', \'' + r.status + '\')" title="Edit Room">✏️ Edit</button>' +
                                             '<form method="post" action="' + CTX + '/admin-dashboard" style="display:inline;">' +
                                             '<input type="hidden" name="action" value="delete-room">' +
                                             '<input type="hidden" name="roomId" value="' + r.roomId + '">' +
                                             '<button class="btn btn-small btn-danger" type="submit" onclick="return confirm(\"Delete room?\");">Delete</button>' +
-                                            '</form></td></tr>';
+                                            '</form>' +
+                                            '</div>' +
+                                            '</td></tr>';
                                     }
                                     tbody.innerHTML = html;
                                 })
@@ -614,9 +668,24 @@
                             document.getElementById('editStaffModal').style.display = 'none';
                         }
 
+                        function openEditRoomModal(roomId, roomType, pricePerNight, capacity, status) {
+                            document.getElementById('editRoomIdField').value = roomId;
+                            document.getElementById('editRoomTypeField').value = roomType;
+                            document.getElementById('editRoomPriceField').value = pricePerNight;
+                            document.getElementById('editRoomCapacityField').value = capacity;
+                            document.getElementById('editRoomStatusField').value = status;
+                            document.getElementById('editRoomModal').style.display = 'block';
+                        }
+
+                        function closeEditRoomModal() {
+                            document.getElementById('editRoomModal').style.display = 'none';
+                        }
+
                         window.onclick = function (event) {
-                            var modal = document.getElementById('editStaffModal');
-                            if (event.target === modal) modal.style.display = 'none';
+                            var staffModal = document.getElementById('editStaffModal');
+                            var roomModal = document.getElementById('editRoomModal');
+                            if (event.target === staffModal) staffModal.style.display = 'none';
+                            if (event.target === roomModal) roomModal.style.display = 'none';
                         };
 
                         document.addEventListener('DOMContentLoaded', loadRooms);
@@ -660,6 +729,62 @@
                                     <button type="button" class="cancel-btn"
                                         onclick="closeEditStaffModal()">Cancel</button>
                                     <button type="submit" form="editStaffForm" class="submit-btn">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Room Modal -->
+                        <div id="editRoomModal" class="modal">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2>Edit Room</h2>
+                                    <button class="modal-close" onclick="closeEditRoomModal()">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="<%= request.getContextPath() %>/admin-dashboard"
+                                        id="editRoomForm">
+                                        <input type="hidden" name="action" value="edit-room">
+                                        <input type="hidden" id="editRoomIdField" name="roomId">
+
+                                        <div class="form-group">
+                                            <label for="editRoomTypeField">Room Type:</label>
+                                            <select id="editRoomTypeField" name="roomType" required>
+                                                <option value="">-- Select Room Type --</option>
+                                                <option value="Single">Single</option>
+                                                <option value="Double">Double</option>
+                                                <option value="Deluxe">Deluxe</option>
+                                                <option value="Suite">Suite</option>
+                                                <option value="Presidential">Presidential</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="editRoomPriceField">Price Per Night (LKR):</label>
+                                            <input type="number" id="editRoomPriceField" name="pricePerNight" 
+                                                step="0.01" min="0.01" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="editRoomCapacityField">Capacity (Guests):</label>
+                                            <input type="number" id="editRoomCapacityField" name="capacity" 
+                                                min="1" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="editRoomStatusField">Status:</label>
+                                            <select id="editRoomStatusField" name="status" required>
+                                                <option value="">-- Select Status --</option>
+                                                <option value="Available">Available</option>
+                                                <option value="Occupied">Occupied</option>
+                                                <option value="Maintenance">Maintenance</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="cancel-btn"
+                                        onclick="closeEditRoomModal()">Cancel</button>
+                                    <button type="submit" form="editRoomForm" class="submit-btn">Save Changes</button>
                                 </div>
                             </div>
                         </div>
