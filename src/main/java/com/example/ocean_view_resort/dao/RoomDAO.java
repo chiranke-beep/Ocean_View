@@ -15,5 +15,6 @@ public interface RoomDAO {
     BigDecimal getPriceByRoomType(String roomType); // Get first room price for a room type (fallback for bill generation)
     boolean addRoom(Room room);
     boolean updateRoom(Room room);
+    boolean editRoom(Room room);
     boolean deleteRoom(int roomId);
 }

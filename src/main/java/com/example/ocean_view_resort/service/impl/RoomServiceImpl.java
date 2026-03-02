@@ -113,6 +113,25 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public boolean editRoom(int roomId, String roomType, double pricePerNight, int capacity, String status) {
+        if (roomType == null || roomType.isEmpty() || pricePerNight <= 0 || capacity <= 0 || status == null || status.isEmpty()) {
+            return false;
+        }
+        
+        Room room = roomDAO.getRoomById(roomId);
+        if (room == null) {
+            return false;
+        }
+        
+        room.setRoomType(roomType);
+        room.setPricePerNight(pricePerNight);
+        room.setCapacity(capacity);
+        room.setStatus(status);
+        
+        return roomDAO.editRoom(room);
+    }
+
+    @Override
     public boolean deleteRoom(int roomId) {
         return roomDAO.deleteRoom(roomId);
     }

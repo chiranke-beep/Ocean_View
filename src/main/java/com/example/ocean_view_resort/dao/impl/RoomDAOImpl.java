@@ -122,6 +122,24 @@ public class RoomDAOImpl implements RoomDAO {
     }
 
     @Override
+    public boolean editRoom(Room room) {
+        String sql = "UPDATE room SET room_type=?, price_per_night=?, capacity=?, status=? WHERE room_id=?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, room.getRoomType());
+            ps.setDouble(2, room.getPricePerNight());
+            ps.setInt(3, room.getCapacity());
+            ps.setString(4, room.getStatus());
+            ps.setInt(5, room.getRoomId());
+            int result = ps.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public boolean deleteRoom(int roomId) {
         String sql = "DELETE FROM room WHERE room_id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();

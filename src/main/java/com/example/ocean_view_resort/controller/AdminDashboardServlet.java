@@ -123,6 +123,21 @@ public class AdminDashboardServlet extends HttpServlet {
                 message = ok ? "Room deleted successfully!" : "Failed to delete room.";
                 break;
             }
+            case "edit-room": {
+                try {
+                    int roomId = Integer.parseInt(req.getParameter("roomId"));
+                    String roomType = req.getParameter("roomType");
+                    double pricePerNight = Double.parseDouble(req.getParameter("pricePerNight"));
+                    int capacity = Integer.parseInt(req.getParameter("capacity"));
+                    String status = req.getParameter("status");
+                    
+                    boolean ok = roomService.editRoom(roomId, roomType, pricePerNight, capacity, status);
+                    message = ok ? "Room updated successfully!" : "Failed to update room.";
+                } catch (NumberFormatException e) {
+                    message = "Invalid input format.";
+                }
+                break;
+            }
 
             default:
                 message = "";
